@@ -1,3 +1,5 @@
+import re
+
 class Coordinate:
     def __init__(self, column_id: str, row_id: int):
         self.column_id = column_id.upper()
@@ -8,7 +10,6 @@ class Coordinate:
 
     @staticmethod
     def from_string(coord_str: str) -> 'Coordinate':
-        import re
         match = re.match(r"([A-Z]+)(\d+)", coord_str.upper())
         if not match:
             raise ValueError(f"Invalid coordinate format: {coord_str}")

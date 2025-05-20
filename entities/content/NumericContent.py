@@ -7,5 +7,3 @@ class NumericContent(Content):
     def evaluate(self):
         return self.number
 
-    def to_string(self):
-        return str(self.number)
