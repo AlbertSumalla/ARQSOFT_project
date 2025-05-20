@@ -1,5 +1,5 @@
-from Cell import Cell
-from Coordinate import Coordinate
+from ..core.Cell import Cell
+from ..core.Coordinate import Coordinate
 
 class Spreadsheet:
     def __init__(self, name="Untitled"):

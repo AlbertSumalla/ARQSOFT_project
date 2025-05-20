@@ -1,4 +1,4 @@
-from Content import Content
+from ..content.Content import Content
 
 class TextContent(Content):
     def __init__(self, text: str):
