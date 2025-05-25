@@ -1,72 +1,70 @@
 # entities/errors/exceptions.py
 
-# Excepciones base
+# Base Exceptions
 class SpreadsheetError(Exception):
-    """Error base del sistema de hoja de cálculo."""
+    """Base error for the spreadsheet system."""
     pass
 
-# ----------- FÓRMULAS ----------------
+# ----------- FORMULAS ----------------
 
 class FormulaSyntaxError(SpreadsheetError):
-    """Error de sintaxis al analizar una fórmula."""
+    """Syntax error while analyzing a formula."""
     pass
 
 class TokenizationError(SpreadsheetError):
-    """Error durante el proceso de tokenización."""
+    """Error during the tokenization process."""
     pass
 
 class PostfixGenerationError(SpreadsheetError):
-    """Error al generar la expresión en notación postfija."""
+    """Error while generating the postfix expression."""
     pass
 
 class EvaluationError(SpreadsheetError):
-    """Error general durante la evaluación de una fórmula."""
+    """General error during formula evaluation."""
     pass
 
 class InvalidFunctionError(SpreadsheetError):
-    """Función desconocida o no soportada."""
+    """Unknown or unsupported function."""
     pass
 
 class FunctionArgumentError(SpreadsheetError):
-    """Error en los argumentos de una función."""
+    """Invalid arguments provided to a function."""
     pass
 
-
-# ----------- REFERENCIAS Y CELDAS ----------------
+# ----------- REFERENCES AND CELLS ----------------
 
 class InvalidCellReferenceError(SpreadsheetError):
-    """Referencia a una celda inexistente o mal formada."""
+    """Reference to a non-existent or malformed cell."""
     pass
 
 class DivisionByZeroError(SpreadsheetError):
-    """División por cero durante la evaluación de una fórmula."""
+    """Division by zero during formula evaluation."""
     pass
 
 class CircularDependencyError(SpreadsheetError):
-    """Dependencia circular detectada entre celdas."""
+    """Circular dependency detected among cells."""
     pass
 
-
-# ----------- ARCHIVOS Y SERIALIZACIÓN ----------------
+# ----------- FILES AND SERIALIZATION ----------------
 
 class FileNotFoundError(SpreadsheetError):
-    """El archivo especificado no se encuentra."""
+    """The specified file could not be found."""
     pass
 
 class PathError(SpreadsheetError):
-    """Error al guardar el archivo en la ruta especificada."""
+    """Error saving the file to the specified path."""
     pass
 
 class S2VFormatError(SpreadsheetError):
-    """Error de formato al parsear un archivo S2V."""
+    """Invalid format encountered while parsing the S2V file."""
     pass
 
 class SerializationError(SpreadsheetError):
-    """Error al serializar el contenido del spreadsheet."""
+    """Error while serializing spreadsheet content."""
     pass
 
-
+# ----------- INITIALIZATION ----------------
 
 class InvalidSizeError(SpreadsheetError):
-    """Tamaño inválido al inicializar un spreadsheet."""
+    """Invalid size provided when initializing the spreadsheet."""
     pass

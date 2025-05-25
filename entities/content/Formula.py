@@ -1,7 +1,7 @@
 from ..content.Content import Content
 from ..formula.Tokenizer import Tokenizer
 from ..formula.ShuntingYard import ShuntingYard
-from ..formula.PostfixGener import PostfixEvaluator
+from ..formula.FormulaEvaluate import PostfixEvaluate
 from ..exceptions.Exceptions import *
 
 
@@ -14,17 +14,17 @@ class Formula(Content):
         self.value = None
         self.spreadsheet = spreadsheet  # getter of spreadsheet instance
 
-    def evaluate(self):
+    def get_content(self):
         try:
-            tokens = Tokenizer.tokenize(self.formula_str)
+            tokens_list = Tokenizer.tokenize(self.formula_str)
         except Exception as e:
             raise TokenizationError(f"Tokenization error: {e}")
         try:
-            postfix = ShuntingYard.to_postfix(tokens)
+            postfix_exp = ShuntingYard.generate_postfix_expression(tokens_list)
         except Exception as e:
             raise PostfixGenerationError(f"Postfix generation error {e}")
         try:
-            self.value = PostfixEvaluator.evaluate(postfix, self.spreadsheet)
+            self.value = PostfixEvaluate.evaluate_postfix_expression(postfix_exp, self.spreadsheet)
         except DivisionByZeroError as e:
             raise e
         except InvalidCellReferenceError as e:

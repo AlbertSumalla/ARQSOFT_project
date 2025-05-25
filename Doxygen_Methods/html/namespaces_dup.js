@@ -1,0 +1,28 @@
+var namespaces_dup =
+[
+    [ "methods", "namespacemethods.html", [
+      [ "close_spreadsheet", "namespacemethods.html#aac74b5b36a5addfb348e23731e4487d6", null ],
+      [ "create_content_object", "namespacemethods.html#a0fe2561fe8e906ca4219650b5e23c731", null ],
+      [ "display_cell_formula", "namespacemethods.html#a97b8e49afd3347ccc7b15a28362ba6aa", null ],
+      [ "display_menu", "namespacemethods.html#aa90e89193720a223155dc9430af5b79f", null ],
+      [ "display_spreadsheet", "namespacemethods.html#a4098d88d00e38bf9b42fa868e7049c4b", null ],
+      [ "evaluate_function", "namespacemethods.html#ade761e38f58d29ee4512e9d3c1336369", null ],
+      [ "evaluate_postfix_expression", "namespacemethods.html#ac6e3fc7a1310f162ad17ed95fed36bb9", null ],
+      [ "exit_program", "namespacemethods.html#a883a4957e22ee4a93513575041885ff8", null ],
+      [ "generate_postfix_expression", "namespacemethods.html#a148cc792c42c4f99855d6bf8c3069f89", null ],
+      [ "identify_circular_dependencies", "namespacemethods.html#a87c34fe3608024d0f8eab3e0d3ecd823", null ],
+      [ "identify_input_type", "namespacemethods.html#a369602499dbbcf7ef859f317cc5235de", null ],
+      [ "initialize_spreadsheet", "namespacemethods.html#a9af791f68af2feafbdc5620f34ab5bf6", null ],
+      [ "load_spreadsheet", "namespacemethods.html#ab1ba18fbd6eb4b67ef653d08c8737747", null ],
+      [ "parse_formula", "namespacemethods.html#a82d303bc4a28a32f101c9e0cc313fb09", null ],
+      [ "parse_s2v_line", "namespacemethods.html#a76064426c94a7afb439c76234fa4dbb1", null ],
+      [ "place_content_on_cell", "namespacemethods.html#a2ed0431372d147acb95263ff5fda2467", null ],
+      [ "resolve_cell_references", "namespacemethods.html#a7e2794d8f2e6abc99943364b3e359707", null ],
+      [ "save_to_s2v", "namespacemethods.html#ad51e834a4973b8fe57418d1a7ec225ec", null ],
+      [ "store_formula_and_result", "namespacemethods.html#aa7a52f185bbeb47bf3ab65cf0ae911b8", null ],
+      [ "tokenize_formula", "namespacemethods.html#a0cce4500fe765ca826080527c0ae35ac", null ],
+      [ "update_cell_values", "namespacemethods.html#a91e56a6243b1b8ad5aa5f6655cb5d905", null ],
+      [ "update_dependent_cells", "namespacemethods.html#af6eded99c106a48c6dc773092d5473b4", null ]
+    ] ],
+    [ "methods_assigned_classes", "namespacemethods__assigned__classes.html", "namespacemethods__assigned__classes" ]
+];

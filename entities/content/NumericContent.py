@@ -1,9 +1,9 @@
-from Content import Content
+from ..content.Content import Content
 
 class NumericContent(Content):
     def __init__(self, number: float):
         self.number = number
 
-    def evaluate(self):
+    def get_content(self):
         return self.number
 

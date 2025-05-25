@@ -1,4 +1,5 @@
-import re
+from ..core.SpreadsheetController import *
+
 
 class Coordinate:
     def __init__(self, column_id: str, row_id: int):
