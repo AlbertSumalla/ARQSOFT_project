@@ -1,7 +1,8 @@
 from ..content.Content import Content
 from ..formula.Tokenizer import Tokenizer
 from ..formula.ShuntingYard import ShuntingYard
-from ..formula.FormulaEvaluate import PostfixEvaluate
+from ..formula.PostfixEvaluator import PostfixEvaluate
+from ..formula.FormulaParse import FormulaParser
 from ..exceptions.Exceptions import *
 
 
@@ -17,6 +18,13 @@ class Formula(Content):
     def get_content(self):
         try:
             tokens_list = Tokenizer.tokenize(self.formula_str)
+        except Exception as e:
+            raise TokenizationError(f"Tokenization error: {e}")
+        try:
+            if FormulaParser.Parse(self.formula_str) == True:
+                pass  # If the formula is valid, proceed with tokenization
+            else:
+                raise FormulaSyntaxError("Invalid formula syntax")
         except Exception as e:
             raise TokenizationError(f"Tokenization error: {e}")
         try:
