@@ -20,13 +20,10 @@ class Formula(Content):
             tokens_list = Tokenizer.tokenize(self.formula_str)
         except Exception as e:
             raise TokenizationError(f"Tokenization error: {e}")
-        try:
-            if FormulaParser.Parse(self.formula_str) == True:
-                pass
-            else:
-                raise FormulaSyntaxError("Invalid formula syntax")
-        except Exception as e:
-            raise TokenizationError(f"Tokenization error: {e}")
+        if FormulaParser.Parse(self.formula_str) == True:
+            pass
+        else:
+            raise FormulaSyntaxError("Invalid formula syntax")
         try:
             postfix_exp = ShuntingYard.generate_postfix_expression(tokens_list)
         except Exception as e:
