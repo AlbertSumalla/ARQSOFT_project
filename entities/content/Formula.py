@@ -22,7 +22,7 @@ class Formula(Content):
             raise TokenizationError(f"Tokenization error: {e}")
         try:
             if FormulaParser.Parse(self.formula_str) == True:
-                pass  # If the formula is valid, proceed with tokenization
+                pass
             else:
                 raise FormulaSyntaxError("Invalid formula syntax")
         except Exception as e:
