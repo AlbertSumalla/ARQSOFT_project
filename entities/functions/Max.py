@@ -1,20 +1,14 @@
+
+from typing import List , Union
+from Argument import Argument
 from Function import Function
 from NumericValue import NumericValue
 
-class Max(Function):
-    @staticmethod
-    def getInstance():
-        return Max()
 
-    def calculate(self, arguments: list[NumericValue]) -> NumericValue:
-        # Si no hay argumentos, devolvemos 0 (o lanza excepción si lo prefieres)
-        if not arguments:
-            return NumericValue(0.0)
-        # Inicializamos result al primer valor
-        result = arguments[0].getAsDouble()
-        # Buscamos el máximo
-        for arg in arguments:
-            value = arg.getAsDouble()
-            if value > result:
-                result = value
-        return NumericValue(result)
+# Definimos un alias para tipos numéricos
+Number = Union[int, float]
+
+class MAX(Function):
+    def compute_formula(self, arguments: List[Argument]) -> Number:
+        self.result = max(arg.get_value() for arg in arguments)
+        return self.result
