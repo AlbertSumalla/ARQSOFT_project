@@ -1,8 +1,8 @@
-from entities.core.Spreadsheet import Spreadsheet
-from entities.core.Cell import Cell
-from entities.content.NumericContent import NumericContent
-from entities.content.TextContent import TextContent
-from entities.content.Formula import Formula
+from ..core.Spreadsheet import Spreadsheet
+from ..core.Cell import Cell
+from ..content.NumericContent import NumericContent
+from ..content.TextContent import TextContent
+from ..content.Formula import Formula
 from Factory.SpreadsheetFactory import SpreadsheetFactory
 from exceptions.Exceptions import *
 

@@ -1,7 +1,6 @@
 from ..core.SpreadsheetController import *
 import re
 
-
 class Coordinate:
     def __init__(self, column_id: str, row_id: int):
         self.column_id = column_id.upper()
