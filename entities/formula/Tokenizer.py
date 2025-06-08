@@ -1,10 +1,6 @@
 from typing import List
 
 class Tokenizer:
-    """
-    Tokenizer sencillo para principiantes.
-    Separa la fórmula carácter a carácter y agrupa dígitos y letras.
-    """
     @staticmethod
     def tokenize(formula_str: str) -> List[str]:
         tokens: List[str] = []

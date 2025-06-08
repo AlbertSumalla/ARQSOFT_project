@@ -8,7 +8,7 @@ from ..exceptions.Exceptions import *
 
 class Formula(Content):
     def __init__(self, formula_str: str, spreadsheet):
-        if not formula_str.startswith('='):
+        if not formula_str.startswith('='): # checkear abans, no aqui !!
             raise FormulaSyntaxError("Formula must start with '='")
         self.raw_formula = formula_str
         self.formula_str = formula_str[1:]  # errase '='
