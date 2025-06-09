@@ -38,5 +38,5 @@ class Formula(Content):
 
         return self.value
 
-    def __str__(self):
-        return self.raw_formula
+    def str_of_formula(self):
+        return self.formula_str
