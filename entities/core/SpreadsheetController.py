@@ -1,55 +1,58 @@
-from ..core.Spreadsheet import Spreadsheet
-from ..core.Cell import Cell
+# entities/core/SpreadsheetController.py
+from entities.core.Spreadsheet import Spreadsheet
 from entities.content.NumericContent import NumericContent
 from entities.content.TextContent import TextContent
-from ..content.Formula import Formula
+from entities.content.Formula import Formula
 from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
 from exceptions.Exceptions import *
 
 class SpreadsheetController:
     """
-    Controlador principal de la hoja de cálculo. Expone métodos que el marker y la UI utilizan.
+    Controlador principal de la hoja de cálculo.
     """
     def __init__(self):
-        # Inicializa la hoja usando la factoría para futuras extensiones
+        # Inicializa la hoja mediante la factoría por defecto
         self.spreadsheet: Spreadsheet = SpreadsheetFactory.create_spreadsheet()
 
     def set_cell_content(self, coord: str, str_content: str) -> None:
         """
-        Modifica el contenido de la celda en la coordenada dada.
+        Inserta contenido en la celda especificada (texto, número o fórmula), recalcula
+        y propaga dependencias.
         """
-        # Identificar tipo de entrada
         ctype = self.identify_input_type(str_content)
-        if ctype == 'formula':
-            expr = str_content[1:]
+        if ctype == 'FORMULA':
+            expr = str_content.lstrip('=')
             content_obj = Formula(expr)
-        elif ctype == 'numeric':
+        elif ctype == 'NUM':
             try:
                 num = float(str_content)
             except ValueError:
                 raise EvaluationError(f"No se pudo convertir '{str_content}' a número")
             content_obj = NumericContent(num)
-        else:
+        else:  # TEXT o EXIT
             content_obj = TextContent(str_content)
+
         try:
+            # Asigna el contenido
             self.spreadsheet.set_cell(coord, content_obj)
-        except InvalidCellReferenceError:
-            raise
-        except CircularDependencyError:
+            # Si es valor numérico o fórmula, actualiza su valor en el modelo
+            if ctype in ('FORMULA', 'NUM'):
+                val = self.get_cell_content_as_float(coord)
+                self.spreadsheet.set_cell_value(coord, val)
+            # Propaga recálculo a dependientes
+            self.resolve_cell_references(coord)
+        except (InvalidCellReferenceError, CircularDependencyError):
+            # Se lanza directamente para el marker
             raise
         except Exception as e:
+            # Errores genéricos de fórmula o parsing
             raise EvaluationError(str(e))
 
     def get_cell_content_as_float(self, coord: str) -> float:
-        """
-        Devuelve el valor de la celda como flotante.
-        """
         try:
             val = self.spreadsheet.get_cell_value(coord)
         except InvalidCellReferenceError:
             raise
-        except Exception as e:
-            raise EvaluationError(str(e))
         if not isinstance(val, (int, float)):
             raise EvaluationError(f"Contenido de la celda '{coord}' no es numérico")
         return float(val)
@@ -62,13 +65,11 @@ class SpreadsheetController:
             content = self.spreadsheet.get_cell(coord).content
         except InvalidCellReferenceError:
             raise
+        # Si es texto, devuelve directamente
         if isinstance(content, TextContent):
             return content.text
-        try:
-            val = self.get_cell_content_as_float(coord)
-            return str(val)
-        except EvaluationError:
-            return str(content)
+        # En caso contrario, formatea el valor numérico
+        return str(self.get_cell_content_as_float(coord))
 
     def get_cell_formula_expression(self, coord: str) -> str:
         """
@@ -84,7 +85,7 @@ class SpreadsheetController:
 
     def save_spreadsheet_to_file(self, file_path: str) -> None:
         """
-        Guarda la hoja en formato S2V en el path dado.
+        Guarda la hoja en disco en formato S2V.
         """
         try:
             self.spreadsheet.save(file_path)
@@ -95,8 +96,10 @@ class SpreadsheetController:
 
     def load_spreadsheet_from_file(self, file_path: str) -> None:
         """
-        Carga la hoja desde un archivo S2V.
+        Carga la hoja desde disco (S2V) y reemplaza el modelo actual.
         """
+        # Recrea un nuevo spreadsheet antes de cargar
+        self.spreadsheet = SpreadsheetFactory.create_spreadsheet()
         try:
             self.spreadsheet.load(file_path)
         except (PathError, S2VFormatError):
@@ -104,36 +107,39 @@ class SpreadsheetController:
         except Exception as e:
             raise S2VFormatError(str(e))
 
+    def resolve_cell_references(self, coord: str) -> None:
+        """
+        Propaga el recálculo a todas las celdas que dependen de la coordenada dada.
+        """
+        deps = self.spreadsheet.get_cell(coord).get_coords_of_dependent_cells()
+        for d in deps:
+            self.spreadsheet.recalculate_from(d)
+
     @staticmethod
     def identify_input_type(input_string: str) -> str:
         """
-        Identifica si el input es 'formula', 'numeric' o 'text'.
+        Determina si la entrada es FORMULA, NUM, TEXT o EXIT.
         """
-        if input_string.startswith('='):
-            return 'formula'
+        s = input_string.strip()
+        lower = s.lower()
+        if lower in ('cancel', 'exit', 'break'):
+            return 'EXIT'
+        if s.startswith('='):
+            return 'FORMULA'
         try:
-            float(input_string)
-            return 'numeric'
+            float(s)
+            return 'NUM'
         except ValueError:
-            return 'text'
+            return 'TEXT'
 
-    @staticmethod
-    def resolve_cell_references(spreadsheet: Spreadsheet, coordinate: str) -> None:
+    def place_content_on_cell(self, coord: str, content_obj) -> None:
         """
-        Propaga dependencias tras un cambio (Observer).
+        Método de conveniencia para asignar un objeto Content a una celda.
         """
-        spreadsheet.recalculate_from(coordinate)
+        self.spreadsheet.set_cell(coord, content_obj)
 
-    @staticmethod
-    def place_content_on_cell(cell_coordinate: str, content_object) -> None:
+    def close_spreadsheet(self) -> None:
         """
-        Asigna el objeto Content a la celda indicada.
+        Limpia o cierra la hoja activa.
         """
-        raise NotImplementedError("Usar set_cell_content en lugar de place_content_on_cell")
-
-    @staticmethod
-    def close_spreadsheet(spreadsheet: Spreadsheet) -> None:
-        """
-        Cierra o limpia la hoja activa.
-        """
-        spreadsheet.clear()
+        self.spreadsheet.clear()

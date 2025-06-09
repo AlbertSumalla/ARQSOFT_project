@@ -1,6 +1,6 @@
 from ..core.Cell import Cell
 from ..core.Coordinate import Coordinate
-from Factory.SpreadsheetFactory import SpreadsheetFactory 
+from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
 
 class Spreadsheet:
     def __init__(self, name="Untitled", factory=None):
