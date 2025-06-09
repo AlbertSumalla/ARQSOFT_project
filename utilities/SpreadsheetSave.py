@@ -1,11 +1,33 @@
+# utilities/SpreadsheetSave.py
+
+import os
+from entities.exceptions.Exceptions import PathError
 
 class SpreadsheetSave:
+    """
+    Responsible for saving spreadsheets in S2V (semicolon-separated values) format.
+    """
 
-    ##
-    # @brief Saves the spreadsheet to a file in S2V format.
-    # @param serial_rows: The Spreadsheet serialized in rows.
-    # @param file_path Path where the S2V file will be saved.
-    # @exception PathError Raised if the file cannot be saved correctly.
-    # @return None.
-    def save_to_s2v(serial_rows, file_path):
-        pass
+    @staticmethod
+    def save_to_s2v(serial_rows, file_path: str) -> None:
+        """
+        Save the provided serialized rows to a file in S2V format.
+
+        :param serial_rows: iterable of rows, each a sequence of cell string values
+        :param file_path: path where the S2V file will be saved
+        :raises PathError: if the file cannot be written
+        """
+        try:
+            # Determine write mode: append if file exists and is not a directory, else write
+            mode = 'a' if os.path.exists(file_path) and not os.path.isdir(file_path) else 'w'
+            with open(file_path, mode, encoding='utf-8') as f:
+                for row in serial_rows:
+                    # Write each cell followed by a semicolon
+                    for cell in row:
+                        f.write(str(cell))
+                        f.write(';')
+                    # End of row
+                    f.write('\n')
+        except Exception as e:
+            # Wrap any IO error in PathError
+            raise PathError(str(e))
