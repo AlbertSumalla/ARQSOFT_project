@@ -31,3 +31,34 @@ class SpreadsheetController(ISpreadsheetFactoryForChecker):
 
     def load_spreadsheet_from_file(self, file_path: str):
         pass
+
+        ##
+    # @brief Resolves the value of a referenced cells.
+    # @param Spreadsheet: The spreadsheet object containing cells.
+    # @param coordinate: The cell reference that has changed
+    # @return None
+    def resolve_cell_references(spreadsheet,coordinate):
+        pass
+
+    ##
+    # @brief Identifies the type of content entered by the user.
+    # @param input_string The raw content from user.
+    # @return content type as str, that can be: 'text', 'numeric', or 'formula'.
+    def identify_input_type(input_string):
+        pass
+
+    ##
+    # @brief Sets a content on a specified cell.
+    # @param cell_coordinate: Target cell coordinate where to place content.
+    # @param Content_object: The content object to place in the cell.
+    # @param content A Content object to assign to the cell.
+    # @return None.
+    def place_content_on_cell(cell_coordinate, content_object):
+        pass
+
+    ##
+    # @brief Closes the currently active spreadsheet.
+    # @param Spreadsheet: The Spreadsheet object to close.
+    # @return None.
+    def close_spreadsheet(spreadsheet):
+        pass

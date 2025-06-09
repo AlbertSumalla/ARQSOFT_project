@@ -22,7 +22,12 @@ class ShuntingYard:
         '/': True,
         '^': False
     }
-
+  
+    ##
+    # @brief System generates a postfix expression using Shunting-Yard.
+    # @param tokens_list: List of tokens, Token[] array 
+    # @exception PostfixError Raised if postfix generation fails.
+    # @return postfix_exp: Expression with a combination of operands and opeators.
     @staticmethod
     def generate_postfix_expression(tokens: List[str]) -> List[str]:
         """
