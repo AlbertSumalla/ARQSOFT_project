@@ -7,139 +7,90 @@ from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
 from exceptions.Exceptions import *
 
 class SpreadsheetController:
-    """
-    Controlador principal de la hoja de cálculo.
-    """
     def __init__(self):
-        # Inicializa la hoja mediante la factoría por defecto
         self.spreadsheet: Spreadsheet = SpreadsheetFactory.create_spreadsheet()
 
-    def set_cell_content(self, coord: str, str_content: str) -> None:
-        """
-        Inserta contenido en la celda especificada (texto, número o fórmula), recalcula
-        y propaga dependencias.
-        """
-        ctype = self.identify_input_type(str_content)
-        if ctype == 'FORMULA':
-            expr = str_content.lstrip('=')
-            content_obj = Formula(expr)
-        elif ctype == 'NUM':
-            try:
-                num = float(str_content)
-            except ValueError:
-                raise EvaluationError(f"No se pudo convertir '{str_content}' a número")
-            content_obj = NumericContent(num)
-        else:  # TEXT o EXIT
-            content_obj = TextContent(str_content)
+    ##@brief Tries to set the content of a cell of the spreadsheet in a certain coordinate. See complete specification below following the link.
+    #
+    # @param coord   a string representing a coordinate in spreadsheet ('A10', for instance).
+    #
+    # @param str_content a string that contains the text representation of the purported new content ("=A1+10" or "2.0"
+    # or "This is a string", for instance).
+    #
+    # @exception BadCoordinateException if the cellCoord argument does not represent a proper spreadsheet coordinate
+    #
+    # @exception ContentException if the content represents a formula which is not
+    # correct by any other reason than introducing a circular dependency in the spreadsheet
+    #
+    # @exception CircularDependencyException if the code detects that the strContent is
+    # formula that introduces in the spreadsheet some circular dependency
 
-        try:
-            # Asigna el contenido
-            self.spreadsheet.set_cell(coord, content_obj)
-            # Si es valor numérico o fórmula, actualiza su valor en el modelo
-            if ctype in ('FORMULA', 'NUM'):
-                val = self.get_cell_content_as_float(coord)
-                self.spreadsheet.set_cell_value(coord, val)
-            # Propaga recálculo a dependientes
-            self.resolve_cell_references(coord)
-        except (InvalidCellReferenceError, CircularDependencyError):
-            # Se lanza directamente para el marker
-            raise
-        except Exception as e:
-            # Errores genéricos de fórmula o parsing
-            raise EvaluationError(str(e))
+    def set_cell_content(self, coord, str_content):
+        pass
 
-    def get_cell_content_as_float(self, coord: str) -> float:
-        try:
-            val = self.spreadsheet.get_cell_value(coord)
-        except InvalidCellReferenceError:
-            raise
-        if not isinstance(val, (int, float)):
-            raise EvaluationError(f"Contenido de la celda '{coord}' no es numérico")
-        return float(val)
+    ##@brief Returns the value of the content of a cell as a float. See complete specification below following the link.
+    #
+    # @param coord   a string representing a coordinate in spreadsheet ('A10', for instance).
+    #
+    # @return a float representing the value of the content of a cell. If the cell contains a
+    # textual content whose value is the textual representation of a number, it shall return this number. If the cell contains
+    # a numerical content, it just returns its value. If the cell contentis a formula, it returns the number resulting
+    # of evaluating such formula
+    #
+    # @exception BadCoordinateException if the cellCoord argument does not represent a proper spreadsheet coordinate
+    #
+    # @exception NoNumberException if the cell contains textual content whose value is a string that is not the textual
+    # representation of a number
 
-    def get_cell_content_as_string(self, coord: str) -> str:
-        """
-        Devuelve la representación en cadena del contenido de la celda.
-        """
-        try:
-            content = self.spreadsheet.get_cell(coord).content
-        except InvalidCellReferenceError:
-            raise
-        # Si es texto, devuelve directamente
-        if isinstance(content, TextContent):
-            return content.text
-        # En caso contrario, formatea el valor numérico
-        return str(self.get_cell_content_as_float(coord))
+    def get_cell_content_as_float(self, coord):
+        pass
 
-    def get_cell_formula_expression(self, coord: str) -> str:
-        """
-        Devuelve la expresión de la fórmula (sin '='). Lanza EvaluationError si no hay fórmula.
-        """
-        try:
-            content = self.spreadsheet.get_cell(coord).content
-        except InvalidCellReferenceError:
-            raise
-        if not isinstance(content, Formula):
-            raise EvaluationError(f"La celda '{coord}' no contiene una fórmula")
-        return content.expression
+    ##@brief Returns a string  version of the content of a cell.
+    #
+    # @param coord   a string representing a coordinate in spreadsheet ('A10', for instance).
+    #
+    # @return a string  version of the content of a cell. If the cell contains a
+    # textual content it directly shall return its string value. If the cell contains a numerical content,
+    # it returns the textual representation of the number . If the cell content is a formula, it returns the
+    # string representing the number resulting of evaluating such formula
+    #
+    # @exception BadCoordinateException if the cellCoord argument does not represent a proper spreadsheet coordinate
 
-    def save_spreadsheet_to_file(self, file_path: str) -> None:
-        """
-        Guarda la hoja en disco en formato S2V.
-        """
-        try:
-            self.spreadsheet.save(file_path)
-        except (PathError, S2VFormatError):
-            raise
-        except Exception as e:
-            raise PathError(str(e))
+    def get_cell_content_as_string(self, coord):
+        pass
 
-    def load_spreadsheet_from_file(self, file_path: str) -> None:
-        """
-        Carga la hoja desde disco (S2V) y reemplaza el modelo actual.
-        """
-        # Recrea un nuevo spreadsheet antes de cargar
-        self.spreadsheet = SpreadsheetFactory.create_spreadsheet()
-        try:
-            self.spreadsheet.load(file_path)
-        except (PathError, S2VFormatError):
-            raise
-        except Exception as e:
-            raise S2VFormatError(str(e))
+    ##@brief Returns the textual representation of the formula present in the cell whose coordiantes are represented by argument coord; the textual
+    # representation of a formula MUST NOT INCLUDE THE '=' character, and there must not be any whitespace.
+    #
+    # @param coord   a string representing a coordinate in spreadsheet ('A10', for instance).
+    #
+    # @return a string containing the textual representation of a formula without the initial '=' character. Example "A1*B5*SUMA(A2:B27)"
+    #
+    # @exception BadCoordinateException if the coord argument does not represent a legal coordinate in the spreadsheet
+    # OR if the coord argument represents a legal coordinate BUT cell in this coordinate DOES NOT CONTAIN A FORMULA
 
-    def resolve_cell_references(self, coord: str) -> None:
-        """
-        Propaga el recálculo a todas las celdas que dependen de la coordenada dada.
-        """
-        deps = self.spreadsheet.get_cell(coord).get_coords_of_dependent_cells()
-        for d in deps:
-            self.spreadsheet.recalculate_from(d)
+    def get_cell_formula_expression(self, coord):
+        pass
 
-    @staticmethod
-    def identify_input_type(input_string: str) -> str:
-        """
-        Determina si la entrada es FORMULA, NUM, TEXT o EXIT.
-        """
-        s = input_string.strip()
-        lower = s.lower()
-        if lower in ('cancel', 'exit', 'break'):
-            return 'EXIT'
-        if s.startswith('='):
-            return 'FORMULA'
-        try:
-            float(s)
-            return 'NUM'
-        except ValueError:
-            return 'TEXT'
+    ##@brief Tries to save the spreadsheet into a file.
+    #
+    # @param s_name_in_user_dir  the local name of the file with respect to the folder where the invoking method is placed
+    # (this is o because the markerrun shall look for files within the folder where testing classes are placed). The
+    # absolute path shall be computed using the following expression: os.path.join(os.getcwd(),s_name_in_user_dir)
+    #
+    # @exception SavingSpreadSheetException if something has gone wrong while trying to write the spreadsheet into the aforementioned file
 
-    def place_content_on_cell(self, coord: str, content_obj) -> None:
-        """
-        Método de conveniencia para asignar un objeto Content a una celda.
-        """
-        self.spreadsheet.set_cell(coord, content_obj)
+    def save_spreadsheet_to_file(self, s_name_in_user_dir):
+        pass
 
-    def close_spreadsheet(self) -> None:
-        """
-        Limpia o cierra la hoja activa.
-        """
-        self.spreadsheet.clear()
+    ##@brief Tries to load the spreadsheet from a file.
+    #
+    # @param s_name_in_user_dir  the local name of the file with respect to the folder where the invoking method is placed
+    # (this is o because the markerrun shall look for files within the folder where testing classes are placed). The
+    # absolute path shall be computed using the following expression: os.path.join(os.getcwd(),s_name_in_user_dir)
+    #
+    # @exception ReadingSpreadSheetException if something has gone wrong while trying to create spreadsheet and fill
+    # it with the data present within the aforementioned file.
+
+    def load_spreadsheet_from_file(self, s_name_in_user_dir):
+        pass

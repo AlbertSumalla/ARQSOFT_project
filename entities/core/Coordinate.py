@@ -1,4 +1,4 @@
-from ..core.SpreadsheetController import *
+from .SpreadsheetController_aux import *
 import re
 
 class Coordinate:
