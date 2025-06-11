@@ -7,17 +7,7 @@ class UserInterface:
     def __init__(self):
         self.controller = SpreadsheetController(self)
         self.renderer = SpreadsheetRenderer()
-
-    def display_cell_formula(self, coord: str) -> None:
-        """
-        Display the formula defined in a specific cell.
-        """
-        try:
-            formula = self.controller.get_cell_formula_expression(coord)
-            print(f"Formula at {coord}: {formula}")
-        except Exception as e:
-            print(f"Error displaying formula at {coord}: {e}")
-
+        
     def display_menu(self) -> None:
         """
         Display the main menu of available commands.
@@ -42,7 +32,7 @@ class UserInterface:
 
             match command:
                 case 'C':
-                    self.controller.create_spreadsheet()
+                    self.controller.create_spreadsheet(10,10)
 
                 case 'E':
                     if len(parts) < 3:
