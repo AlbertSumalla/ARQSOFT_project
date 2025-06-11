@@ -13,12 +13,6 @@ class SpreadsheetController:
         self.spreadsheet = None
 
     def create_spreadsheet(self, rows, cols) -> None:
-        """
-        1) Ask the factory for a blank sheet.
-        2) For each position (r,c) build a Coordinate r,c
-        3) Create a default empty TextContent via factory.create_text("")
-        4) Wrap in a Cell and store in the sheet.
-        """
         self.spreadsheet = self.factory.create_spreadsheet(rows, cols)
 
         for r in range(1, rows + 1):
@@ -27,10 +21,6 @@ class SpreadsheetController:
                 coord = Coordinate.from_string(f"{letter}{r}")
                 cell = self.factory.create_cell(coord, "")
                 self.spreadsheet.set_cell(coord, cell)
-
-    
-
-
 
 
     ##@brief Tries to set the content of a cell of the spreadsheet in a certain coordinate. See complete specification below following the link.

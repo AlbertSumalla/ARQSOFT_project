@@ -11,3 +11,10 @@ class Coordinate:
     @staticmethod
     def index_to_letter(i: int) -> str:
         return chr(ord('A') + i - 1)
+    
+    @classmethod
+    def from_string(cls, s: str) -> "Coordinate":
+        letter = ''.join(filter(str.isalpha, s)).upper()
+        number = int(''.join(filter(str.isdigit, s)))
+        col = ord(letter) - ord('A') + 1
+        return cls(number, col)
