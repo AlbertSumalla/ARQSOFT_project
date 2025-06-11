@@ -68,3 +68,42 @@ class SerializationError(SpreadsheetError):
 class InvalidSizeError(SpreadsheetError):
     """Invalid size provided when initializing the spreadsheet."""
     pass
+
+# ----------- MARKER ----------------
+
+class BadCoordinateException(SpreadsheetError):
+    """
+    Raised when a cell reference is invalid or malformed.
+    """
+    pass
+
+class ContentException(SpreadsheetError):
+    """
+    Raised when a formula or content string is syntactically or semantically incorrect.
+    """
+    pass
+
+class CircularDependencyException(SpreadsheetError):
+    """
+    Raised when a formula introduces a circular dependency among cells.
+    """
+    pass
+
+class NoNumberException(SpreadsheetError):
+    """
+    Raised when trying to get a numeric value from a non-numeric cell.
+    """
+    pass
+
+class SavingSpreadSheetException(SpreadsheetError):
+    """
+    Raised when an error occurs saving the spreadsheet to a file.
+    """
+    pass
+
+class ReadingSpreadSheetException(SpreadsheetError):
+    """
+    Raised when an error occurs loading the spreadsheet from a file.
+    """
+    pass
+
