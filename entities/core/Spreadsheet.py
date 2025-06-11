@@ -10,10 +10,10 @@ class Spreadsheet:
         self.cells[coord] = cell
 
     def get_cell(self, coord: Coordinate) -> Cell:
-        if coord not in self.cells:
+        try:
+            return self.cells.get(coord)
+        except KeyError:
             raise InvalidCellReferenceError(f"Cell {coord} does not exist")
-        return self.cells[coord]
-
     
     def get_cell_value(self, coord: Coordinate) -> float:
         return self.get_cell(coord).get_cell_content()

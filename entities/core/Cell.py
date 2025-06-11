@@ -10,7 +10,8 @@ class Cell:
 
     def get_cell_content(self):
         return self.content
-    
+    def set_content(self, content: Content):
+        self.content = content
     def get_cell_formula(self):
         return self.formula
 

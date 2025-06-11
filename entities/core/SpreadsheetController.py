@@ -40,7 +40,8 @@ class SpreadsheetController(Spreadsheet):
 
     def set_cell_content(self, coord, str_content):
         try: #parse coord
-            self.spreadsheet.get_cell(coord)
+            coord_obj = Coordinate.from_string(coord)
+            cell = self.spreadsheet.get_cell(coord_obj)
         except Exception:
             raise InvalidCellReferenceError(f"Bad coordinate: {coord}")
 
@@ -62,23 +63,23 @@ class SpreadsheetController(Spreadsheet):
         if ctype in ("FORMULA"):
             #crec que no fa falta fer raise error perque a Formula ja estan (crec)
             result = content_obj.get_content(str_content, self.spreadsheet) #int result of evaluation
-            cell = self.spreadsheet.get_cell(coord)
+            cell = self.spreadsheet.get_cell(coord_obj)
             cell.store_result(cell, result)
         try:
-            self.spreadsheet.get_cell(coord)
+            self.spreadsheet.get_cell(coord_obj)
         except Exception as e:
             raise EvaluationError(f"Cell not found: {e}")
-        
-        self.spreadsheet.set_cell(coord, content_obj) #Set content value
+        cell = self.factory.create_cell(coord_obj, content_obj)
+        self.spreadsheet.set_cell(coord_obj, cell) #Set content value
 
 
         # propagate dependencies
-        # self.spreadsheet.recalculate_from(coord)
+        # self.spreadsheet.recalculate_from(coord_obj)
 
 
     @staticmethod
     def identify_input_type(input_string: str) -> str:
-        s = input_string.strip()
+        s = str(input_string).strip()
         if s.startswith('='):
             return 'FORMULA'
         try:
@@ -117,7 +118,18 @@ class SpreadsheetController(Spreadsheet):
     # @exception BadCoordinateException if the cellCoord argument does not represent a proper spreadsheet coordinate
 
     def get_cell_content_as_string(self, coord):
-        pass
+        coord_obj = Coordinate.from_string(coord)
+        # … parsear coord a coord_obj …
+        content_obj = self.spreadsheet.get_cell_value(coord_obj)
+
+        if content_obj is None:
+            return ""
+        # Si es un TextContent, extraemos el atributo interno (p. ej. .text o .value)
+        if isinstance(content_obj, TextContent):
+            return content_obj.text  # o content_obj.value según cómo lo hayas llamado
+
+        # Para otros tipos de Content (NumberContent, etc.) conviértelo a str
+        return str(content_obj)
 
     ##@brief Returns the textual representation of the formula present in the cell whose coordiantes are represented by argument coord; the textual
     # representation of a formula MUST NOT INCLUDE THE '=' character, and there must not be any whitespace.
