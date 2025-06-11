@@ -12,7 +12,7 @@ class SpreadsheetController:
         self.factory = SpreadsheetFactory()
         self.spreadsheet = None
 
-    def create_spreadsheet(self, rows, cols) -> None:
+    def create_spreadsheet(self, rows: int, cols:int) -> None:
         self.spreadsheet = self.factory.create_spreadsheet(rows, cols)
 
         for r in range(1, rows + 1):
@@ -39,8 +39,55 @@ class SpreadsheetController:
     # formula that introduces in the spreadsheet some circular dependency
 
     def set_cell_content(self, coord, str_content):
-        pass
+        try: #parse coord
+            coord = Coordinate.from_string(coord)
+        except Exception:
+            raise InvalidCellReferenceError(f"Bad coordinate: {coord}")
+        
+        #content type
+        ctype = self.identify_input_type(str_content)
+        if ctype == "FORMULA":
+            formula = str_content.lstrip("=")
+            content_obj = self.factory.create_formula(formula, self.spreadsheet)
+        elif ctype == "NUM":
+            try:
+                num = float(str_content)
+            except ValueError:
+                raise EvaluationError(f"Cannot convert '{str_content}' to number")
+            content_obj = self.factory.create_number(num)
+        else: #text case
+            content_obj = self.factory.create_text(str_content)
 
+        # Evaluate if is a formula
+        if ctype in ("FORMULA"):
+            #crec que no fa falta fer raise error perque a Formula ja estan (crec)
+            result = content_obj.get_content(str_content, self.spreadsheet) #int result of evaluation
+            cell = self.spreadsheet.get_cell(coord)
+            cell.store_result(cell, result)
+        try:
+            self.spreadsheet.get_cell(coord)
+        except Exception as e:
+            raise EvaluationError(f"Cell not found: {e}")
+        
+        self.spreadsheet.set_cell(coord, content_obj) #Set content value
+
+
+        # propagate dependencies
+        self.spreadsheet.recalculate_from(coord)
+
+
+    @staticmethod
+    def identify_input_type(input_string: str) -> str:
+        s = input_string.strip()
+        if s.startswith('='):
+            return 'FORMULA'
+        try:
+            float(s)
+            return 'NUM'
+        except ValueError:
+            pass
+        return 'TEXT'
+    
     ##@brief Returns the value of the content of a cell as a float. See complete specification below following the link.
     #
     # @param coord   a string representing a coordinate in spreadsheet ('A10', for instance).
