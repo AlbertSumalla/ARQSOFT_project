@@ -8,8 +8,8 @@ from ..exceptions.Exceptions import *
 
 class Formula(Content):
     def __init__(self, formula_str: str, spreadsheet):
-        self.formula_str = formula_str[1:]  # errase '='
-        self.value = None
+        self.formula_str = formula_str
+        self.result = None
         self.spreadsheet = spreadsheet  # getter of spreadsheet instance
 
     def get_content(self):
@@ -26,7 +26,7 @@ class Formula(Content):
         except Exception as e:
             raise PostfixGenerationError(f"Postfix generation error {e}")
         try:
-            self.value = PostfixEvaluate.evaluate_postfix_expression(postfix_exp, self.spreadsheet)
+            self.result = PostfixEvaluate.evaluate_postfix_expression(postfix_exp, self.spreadsheet)
         except DivisionByZeroError as e:
             raise e
         except InvalidCellReferenceError as e:
@@ -36,7 +36,4 @@ class Formula(Content):
         except Exception as e:
             raise EvaluationError(f"Evaluation formula error: {e}")
 
-        return self.value
-
-    def str_of_formula(self):
-        return self.formula_str
+        return self.result

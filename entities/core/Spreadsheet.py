@@ -1,23 +1,23 @@
 from ..core.Cell import Cell
-from ..core.Coordinate import Coordinate
-from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
+from entities.core.Coordinate import Coordinate
+from entities.exceptions.Exceptions import InvalidCellReferenceError
 
 class Spreadsheet:
-    def __init__(self, name="Untitled", factory=None):
-        self.name = name
-        self.cells = {}
-        self.factory = factory
+    def __init__(self, rows: int, cols: int):
+        self.cells: dict[Coordinate, Cell] = {}
+        self.rows = rows
+        self.cols = cols
 
-    def get_cell(self, coord_str: str) -> Cell:
-        return self.cells.get(coord_str)
+    def set_cell(self, coord: Coordinate, cell: Cell) -> None:
+        if coord not in self.cells:
+            raise InvalidCellReferenceError(f"Cell {coord} does not exist")
+        self.cells[coord] = cell
 
-    def set_cell(self, coord_str: str, content):
-        coord = Coordinate.from_string(coord_str)
-        if self.factory:
-            cell = self.factory.create_cell(coord, content)
-        else:
-            cell = Cell(coord, content)
-        self.cells[coord_str] = cell
+    def get_cell(self, coord: Coordinate) -> Cell:
+        return self.cells[coord]
+    
+    def get_cell_value(self, coord: Coordinate) -> float:
+        return self.get_cell(coord).get_cell_content()
 
     ##
     # @brief Updates all cells that depend on a modified cell.

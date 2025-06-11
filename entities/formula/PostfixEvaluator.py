@@ -1,4 +1,4 @@
-class FormulaProcess:
+class PostfixEvaluate:
 
     ##
     # @brief Evaluates a postfix expression to extract its result.
