@@ -12,7 +12,11 @@
       <sourceFolder url="file://$MODULE_DIR$/usecasesmarker" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/utilities" isTestSource="false" />
     </content>
+<<<<<<< Updated upstream
     <orderEntry type="jdk" jdkName="Python 3.13 (Spreadsheet_pycharm)" jdkType="Python SDK" />
+=======
+    <orderEntry type="jdk" jdkName="Python 3.13 (ARQSOFT_project)" jdkType="Python SDK" />
+>>>>>>> Stashed changes
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
