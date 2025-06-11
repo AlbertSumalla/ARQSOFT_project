@@ -7,7 +7,7 @@ from entities.content.Formula import Formula
 from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
 from exceptions.Exceptions import *
 
-class SpreadsheetController:
+class SpreadsheetController(Spreadsheet):
     def __init__(self):
         self.factory = SpreadsheetFactory()
         self.spreadsheet = None
@@ -40,14 +40,14 @@ class SpreadsheetController:
 
     def set_cell_content(self, coord, str_content):
         try: #parse coord
-            coord = Coordinate.from_string(coord)
+            self.spreadsheet.get_cell(coord)
         except Exception:
             raise InvalidCellReferenceError(f"Bad coordinate: {coord}")
-        
+
         #content type
         ctype = self.identify_input_type(str_content)
         if ctype == "FORMULA":
-            formula = str_content.lstrip("=")
+            formula = str_content[1:]
             content_obj = self.factory.create_formula(formula, self.spreadsheet)
         elif ctype == "NUM":
             try:
@@ -73,7 +73,7 @@ class SpreadsheetController:
 
 
         # propagate dependencies
-        self.spreadsheet.recalculate_from(coord)
+        # self.spreadsheet.recalculate_from(coord)
 
 
     @staticmethod

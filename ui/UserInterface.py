@@ -40,7 +40,7 @@ class UserInterface:
                         continue
                     coord = parts[1]
                     content = parts[2]
-                    self.controller.edit_cell(coord, content)
+                    self.controller.set_cell_content(coord, content)
 
                 case 'L':
                     if len(parts) < 2:
