@@ -15,6 +15,7 @@ class SpreadsheetControllerForChecker(ISpreadsheetControllerForChecker):
 
     def set_cell_content(self, coord, str_content):
         try:
+            self._ctrl.create_spreadsheet(10, 10)
             self._ctrl.set_cell_content(coord, str_content)
         except InvalidCellReferenceError:
             raise BadCoordinateException()
