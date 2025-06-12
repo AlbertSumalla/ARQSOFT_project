@@ -1,6 +1,7 @@
 # entities/core/SpreadsheetController.py
 from entities.core.Spreadsheet import Spreadsheet
 from entities.core.Coordinate import Coordinate
+from entities.core.Cell import Cell
 from entities.content.NumericContent import NumericContent
 from entities.content.TextContent import TextContent
 from entities.content.Formula import Formula
@@ -37,8 +38,9 @@ class SpreadsheetController(Spreadsheet):
     #
     # @exception CircularDependencyException if the code detects that the strContent is
     # formula that introduces in the spreadsheet some circular dependency
-
+    
     def set_cell_content(self, coord, str_content):
+        # tornada a revisar, no testeada
         try: #parse coord
             coord_obj = Coordinate.from_string(coord)
             cell = self.spreadsheet.get_cell(coord_obj)
@@ -60,17 +62,13 @@ class SpreadsheetController(Spreadsheet):
             content_obj = self.factory.create_text(str_content)
         
         # Evaluate if is a formula and save cell. if not, just save the content
-        if ctype in ("FORMULA"):
-            #crec que no fa falta fer raise error perque a Formula ja estan (crec)
-            result = content_obj.get_content(str_content, self.spreadsheet) #int result of evaluation
+        if ctype in ("FORMULA"): 
+            result = content_obj.get_content(formula, self.spreadsheet) #float del result of evaluation
             cell = self.factory.create_cell(coord_obj, result)
             cell.store_result(cell, result)
-        else:
+        else: # Si no es formula, guardem el contingut a la cell directament
             cell = self.factory.create_cell(coord_obj, content_obj)
-        try:
-            self.spreadsheet.get_cell(coord_obj)
-        except Exception as e:
-            raise BadCoordinateException(f"Cell not found: {e}")
+
         self.spreadsheet.set_cell(coord_obj, cell) #Set content value
 
 
@@ -106,15 +104,15 @@ class SpreadsheetController(Spreadsheet):
 
     def get_cell_content_as_float(self, coord):
         # feta desde 0, crec q esta  bé, no testeada
-        coord_obj = Coordinate.from_string(coord)
         try:
+            coord_obj = Coordinate.from_string(coord)
             cell = self.spreadsheet.get_cell(coord_obj)  
-        except:
+        except Exception:
             raise BadCoordinateException(f"No cell on this coordinate: {coord}")
         
-        result = cell.get_cell_formula()
-        if  result is not None:
-            return result
+        formula = cell.get_cell_formula()
+        if  formula is not None:
+            return cell.get_cell_content() #retornem el resultat de la formula
         else:
             cell_content = cell.get_cell_content()
             ctype = self.identify_input_type(cell_content) # comprovem si es Numeric o Text
@@ -139,10 +137,10 @@ class SpreadsheetController(Spreadsheet):
 
     def get_cell_content_as_string(self, coord):
         # re-feta, esta  bé, no testeada
-        coord_obj = Coordinate.from_string(coord)
         try:
-            cell = self.spreadsheet.get_cell(coord_obj)
-        except:
+            coord_obj = Coordinate.from_string(coord)
+            cell = self.spreadsheet.get_cell(coord_obj) 
+        except Exception:
             raise BadCoordinateException(f"No cell on this coordinate: {coord}")
         cell_content = cell.get_cell_content()
 
@@ -159,7 +157,16 @@ class SpreadsheetController(Spreadsheet):
     # OR if the coord argument represents a legal coordinate BUT cell in this coordinate DOES NOT CONTAIN A FORMULA
 
     def get_cell_formula_expression(self, coord):
-        pass
+        # feta desde 0, crec q esta  bé, no testeada
+        coord_obj = Coordinate.from_string(coord)
+        try:
+            cell = self.spreadsheet.get_cell(coord_obj)  
+        except Exception:
+            raise BadCoordinateException(f"No cell on this coordinate: {coord}")
+        
+        formula = cell.get_cell_formula()
+        if  formula is not None:
+            return formula #retornem el resultat de la formula
 
     ##@brief Tries to save the spreadsheet into a file.
     #

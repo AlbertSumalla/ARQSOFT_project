@@ -12,7 +12,7 @@ class Formula(Content):
         self.result = None
         self.spreadsheet = spreadsheet  # getter of spreadsheet instance
 
-    def get_content(self):
+    def get_content(self) -> float:
         try:
             tokens_list = Tokenizer.tokenize(self.formula_str)
         except Exception as e:
