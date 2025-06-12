@@ -10,13 +10,8 @@ class Spreadsheet:
         self.cells[coord] = cell
 
     def get_cell(self, coord: Coordinate) -> Cell:
-        try:
-            return self.cells.get(coord)
-        except KeyError:
-            raise InvalidCellReferenceError(f"Cell {coord} does not exist")
-    
-    def get_cell_value(self, coord: Coordinate) -> float:
-        return self.get_cell(coord).get_cell_content()
+        return self.cells.get(coord)
+
 
     ##
     # @brief Updates all cells that depend on a modified cell.

@@ -43,7 +43,7 @@ class SpreadsheetController(Spreadsheet):
             coord_obj = Coordinate.from_string(coord)
             cell = self.spreadsheet.get_cell(coord_obj)
         except Exception:
-            raise InvalidCellReferenceError(f"Bad coordinate: {coord}")
+            raise BadCoordinateException(f"No cell on this coordinate: {coord}")
 
         #content type
         ctype = self.identify_input_type(str_content)
@@ -70,7 +70,7 @@ class SpreadsheetController(Spreadsheet):
         try:
             self.spreadsheet.get_cell(coord_obj)
         except Exception as e:
-            raise EvaluationError(f"Cell not found: {e}")
+            raise BadCoordinateException(f"Cell not found: {e}")
         self.spreadsheet.set_cell(coord_obj, cell) #Set content value
 
 
@@ -105,7 +105,26 @@ class SpreadsheetController(Spreadsheet):
     # representation of a number
 
     def get_cell_content_as_float(self, coord):
-        pass
+        # feta desde 0, crec q esta  bé, no testeada
+        coord_obj = Coordinate.from_string(coord)
+        try:
+            cell = self.spreadsheet.get_cell(coord_obj)  
+        except:
+            raise BadCoordinateException(f"No cell on this coordinate: {coord}")
+        
+        result = cell.get_cell_formula()
+        if  result is not None:
+            return result
+        else:
+            cell_content = cell.get_cell_content()
+            ctype = self.identify_input_type(cell_content) # comprovem si es Numeric o Text
+            if ctype == "TEXT":
+                try:
+                    return float(str(cell_content)) # S'intenta extreure el valor numéric del text
+                except ValueError:
+                    raise NoNumberException(f"Cell content '{cell_content}' is not a number")
+            elif ctype == "NUM":
+                return float(cell_content) # Si es un numero, retornem directament el valor numéric
 
     ##@brief Returns a string  version of the content of a cell.
     #
@@ -119,18 +138,15 @@ class SpreadsheetController(Spreadsheet):
     # @exception BadCoordinateException if the cellCoord argument does not represent a proper spreadsheet coordinate
 
     def get_cell_content_as_string(self, coord):
+        # re-feta, esta  bé, no testeada
         coord_obj = Coordinate.from_string(coord)
-        # … parsear coord a coord_obj …
-        content_obj = self.spreadsheet.get_cell_value(coord_obj)
+        try:
+            cell = self.spreadsheet.get_cell(coord_obj)
+        except:
+            raise BadCoordinateException(f"No cell on this coordinate: {coord}")
+        cell_content = cell.get_cell_content()
 
-        if content_obj is None:
-            return ""
-        # Si es un TextContent, extraemos el atributo interno (p. ej. .text o .value)
-        if isinstance(content_obj, TextContent):
-            return content_obj.text  # o content_obj.value según cómo lo hayas llamado
-
-        # Para otros tipos de Content (NumberContent, etc.) conviértelo a str
-        return str(content_obj)
+        return str(cell_content)
 
     ##@brief Returns the textual representation of the formula present in the cell whose coordiantes are represented by argument coord; the textual
     # representation of a formula MUST NOT INCLUDE THE '=' character, and there must not be any whitespace.

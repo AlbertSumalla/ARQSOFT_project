@@ -4,14 +4,16 @@ from ..content.Content import Content
 class Cell:
     def __init__(self, coordinate: Coordinate, content: Content):
         self.coordinate = coordinate
-        self.content = content if content is not None else None
+        self.content = content
         self.formula = None
         self.dependencies = set()
 
     def get_cell_content(self):
         return self.content
-    def set_content(self, content: Content):
+    
+    def set_cell_content(self, content: Content):
         self.content = content
+        
     def get_cell_formula(self):
         return self.formula
 
