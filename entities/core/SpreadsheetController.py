@@ -58,18 +58,19 @@ class SpreadsheetController(Spreadsheet):
             content_obj = self.factory.create_number(num)
         else: #text case
             content_obj = self.factory.create_text(str_content)
-
-        # Evaluate if is a formula
+        
+        # Evaluate if is a formula and save cell. if not, just save the content
         if ctype in ("FORMULA"):
             #crec que no fa falta fer raise error perque a Formula ja estan (crec)
             result = content_obj.get_content(str_content, self.spreadsheet) #int result of evaluation
-            cell = self.spreadsheet.get_cell(coord_obj)
+            cell = self.factory.create_cell(coord_obj, result)
             cell.store_result(cell, result)
+        else:
+            cell = self.factory.create_cell(coord_obj, content_obj)
         try:
             self.spreadsheet.get_cell(coord_obj)
         except Exception as e:
             raise EvaluationError(f"Cell not found: {e}")
-        cell = self.factory.create_cell(coord_obj, content_obj)
         self.spreadsheet.set_cell(coord_obj, cell) #Set content value
 
 
