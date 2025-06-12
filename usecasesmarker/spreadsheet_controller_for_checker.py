@@ -16,7 +16,6 @@ class SpreadsheetControllerForChecker(ISpreadsheetControllerForChecker):
     def set_cell_content(self, coord, str_content):
         try:
             self._ctrl.create_spreadsheet(rows=10, cols=10)
-            print("Spreadsheet created successfully.")
         except Exception as e:
             raise ContentException("Error creating spreadsheet: " + str(e))
         try:

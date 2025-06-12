@@ -3,6 +3,7 @@ from entities.functions.NumericValue import NumericValue
 from entities.functions.Function import Function
 from entities.core.CellRange import CellRange
 from entities.core.Coordinate import Coordinate
+from entities.formula.Operator import Operator
 
 class FormulaFactory:
     @staticmethod
@@ -15,6 +16,8 @@ class FormulaFactory:
     def create_cell_range(start: str, end: str) -> CellRange:
         return CellRange(start, end)
 
+    def create_operator(op: str) -> Operator:
+        return Operator(op)
 
     @staticmethod
     def is_numeric(token: str) -> bool:
