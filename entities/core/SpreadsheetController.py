@@ -71,8 +71,7 @@ class SpreadsheetController(Spreadsheet):
 
         self.spreadsheet.set_cell(coord_obj, cell) #Set content value
 
-
-        # propagate dependencies
+        # propagate dependencies, no implementat encara
         # self.spreadsheet.recalculate_from(coord_obj)
 
 

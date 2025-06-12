@@ -18,5 +18,5 @@ class CellRange:
     def set_end(self, end: Coordinate) -> None:
         self.end = end
 
-    def get_range(self) -> list:
-        '''recorrer la spreadsheet y obtener la lista de coordenadas, se tiene que hacer un bucle'''
+    def set_range(self,cell_range_list: list) -> None:
+        self.range = cell_range_list

@@ -1,5 +1,6 @@
 from ..core.Cell import Cell
 from entities.core.Coordinate import Coordinate
+from entities.core.CellRange import CellRange
 from entities.exceptions.Exceptions import InvalidCellReferenceError
 
 class Spreadsheet:
@@ -12,6 +13,21 @@ class Spreadsheet:
     def get_cell(self, coord: Coordinate) -> Cell:
         return self.cells.get(coord)
 
+
+    def get_cells_in_range(self, cell_range: CellRange) -> list[Cell]:
+        start = cell_range.get_start()
+        end   = cell_range.get_end()
+        range_cell_list: list[Cell] = []
+
+        for r in range(start.row, end.row + 1):
+            for c in range(start.col, end.col + 1):
+                letter = Coordinate.index_to_letter(c)
+                coord  = Coordinate.from_string(f"{letter}{r}")
+                # get_cell will raise if missing
+                cell = self.get_cell(coord)
+                range_cell_list.append(cell)
+
+        return range_cell_list
 
     ##
     # @brief Updates all cells that depend on a modified cell.

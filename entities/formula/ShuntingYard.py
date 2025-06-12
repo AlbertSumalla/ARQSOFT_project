@@ -1,82 +1,88 @@
-from typing import List
+# entities/formula/ShuntingYard.py
+from typing import List, Union
 
-class ShuntingYard:
-    """
-    Implementación del algoritmo Shunting Yard para convertir expresiones infijas
-'to notación postfija (postfix).
-    """
+from entities.formula.Operand import Operand
+from entities.formula.Operator import Operator
+from entities.functions.Function import Function
+from entities.Factory.FormulaFactory import FormulaFactory
+from entities.exceptions.Exceptions import FormulaSyntaxError
 
-    # Definimos precedencias y asociatividad de operadores
-    _precedence = {
-        '+': 2,
-        '-': 2,
-        '*': 3,
-        '/': 3,
-        '^': 4
-    }
-    # True = left-associative, False = right-associative
-    _left_associative = {
-        '+': True,
-        '-': True,
-        '*': True,
-        '/': True,
-        '^': False
-    }
-  
-    ##
-    # @brief System generates a postfix expression using Shunting-Yard.
-    # @param tokens_list: List of tokens, Token[] array 
-    # @exception PostfixError Raised if postfix generation fails.
-    # @return postfix_exp: Expression with a combination of operands and opeators.
+class ShuntingYard:   
+
+
     @staticmethod
-    def generate_postfix_expression(tokens: List[str]) -> List[str]:
-        """
-        Convierte una lista de tokens en notación postfix (RPN).
+    def generate_postfix_expression(tokens: List[str], spreadsheet=None) -> List[Component]:
+        output_postfix: List[Component] = []
 
-        :param tokens: lista de tokens infijos (p.ej. ['3', '+', '4', '*', '2', '/', '(', '1', '-', '5', ')', '^', '2', '^', '3'])
-        :return: lista de tokens en postfix (p.ej. ['3', '4', '2', '*', '1', '5', '-', '2', '3', '^', '^', '/', '+'])
-        """
-        output_queue: List[str] = []
-        operator_stack: List[str] = []
+
+
+    @staticmethod
+    def generate_postfix_expression(tokens: List[str], spreadsheet) -> List[Component]:
+        output_queue: List[Component] = []
+        op_stack: List[Union[str, Operator, Function]] = []
 
         for token in tokens:
-            if token.isalnum() or token.replace('.', '', 1).isdigit():
-                # Si es número o identificador, va directo a la salida
-                output_queue.append(token)
-            elif token in ShuntingYard._precedence:
-                # Operador
-                while operator_stack:
-                    top = operator_stack[-1]
-                    if top in ShuntingYard._precedence:
-                        # Comparamos precedencia
-                        if ((ShuntingYard._left_associative[token] and
-                             ShuntingYard._precedence[token] <= ShuntingYard._precedence[top]) or
-                            (not ShuntingYard._left_associative[token] and
-                             ShuntingYard._precedence[token] < ShuntingYard._precedence[top])):
-                            output_queue.append(operator_stack.pop())
-                            continue
-                    break
-                operator_stack.append(token)
-            elif token == '(':
-                operator_stack.append(token)
-            elif token == ')':
-                # Sacamos hasta '('
-                while operator_stack and operator_stack[-1] != '(':
-                    output_queue.append(operator_stack.pop())
-                # Descartamos '('
-                if operator_stack and operator_stack[-1] == '(':  
-                    operator_stack.pop()
-                else:
-                    raise ValueError("Paréntesis desbalanceados")
-            else:
-                # Token desconocido
-                raise ValueError(f"Token no reconocido: {token}")
+            # Operand: number, reference, or range
+            if ShuntingYard.is_numeric(token) or ShuntingYard.is_cell_reference(token) or ':' in token:
+                comp = FormulaFactory.create_component(token, spreadsheet)
+                output_queue.append(comp)
 
-        # Al terminar, vaciamos la pila de operadores
-        while operator_stack:
-            top = operator_stack.pop()
+            # Function name
+            elif FormulaFactory.is_function_name(token):
+                # Push function identifier onto stack
+                op_stack.append(token)
+
+            # Argument separator (comma)
+            elif token == ',':
+                # Pop until left parenthesis
+                while op_stack and op_stack[-1] != '(':  # type: ignore
+                    output_queue.append(op_stack.pop())
+                if not op_stack:
+                    raise FormulaSyntaxError("Misplaced comma or mismatched parentheses.")
+
+            # Left parenthesis
+            elif token == '(':
+                op_stack.append(token)
+
+            # Right parenthesis
+            elif token == ')':
+                # Pop until matching left parenthesis
+                while op_stack and op_stack[-1] != '(':  # type: ignore
+                    output_queue.append(op_stack.pop())
+                if not op_stack:
+                    raise FormulaSyntaxError("Mismatched parentheses.")
+                # Pop the '('
+                op_stack.pop()
+                # If top of stack is a function name, pop it to output
+                if op_stack and isinstance(op_stack[-1], str) and FormulaFactory.is_function_name(op_stack[-1]):  # type: ignore
+                    func_name = op_stack.pop()  # type: ignore
+                    # The arguments must have been parsed earlier; build the Function now
+                    # Retrieve argument Components from output_queue until matching marker
+                    # (In a fuller implementation, you'd track function argument boundaries.)
+                    # For simplicity, assume FunctionFactory builds with no args here.
+                    func = FormulaFactory.create_function(func_name, [])
+                    output_queue.append(func)
+
+            # Operator
+            elif FormulaFactory.is_operator(token):
+                op1 = FormulaFactory.create_component(token)
+                # Pop operators of greater or equal precedence
+                while op_stack and isinstance(op_stack[-1], Operator):
+                    op2 = op_stack[-1]  # type: ignore
+                    if op1.precedence <= op2.precedence:
+                        output_queue.append(op_stack.pop())
+                    else:
+                        break
+                op_stack.append(op1)
+
+            else:
+                raise FormulaSyntaxError(f"Unrecognized token in ShuntingYard: {token}")
+
+        # Drain the operator stack
+        while op_stack:
+            top = op_stack.pop()
             if top in ('(', ')'):
-                raise ValueError("Paréntesis desbalanceados al final")
-            output_queue.append(top)
+                raise FormulaSyntaxError("Mismatched parentheses in expression.")
+            output_queue.append(top)  # type: ignore
 
         return output_queue

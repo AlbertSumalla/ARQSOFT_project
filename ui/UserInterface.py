@@ -19,6 +19,19 @@ class UserInterface:
         print("S <file_path> - Save spreadsheet to file")
         print("X - Exit the program")
 
+    def test(self) -> None:
+        self.controller.create_spreadsheet(10,10)
+        print("Spreadsheet created with 10 rows and 10 columns.")
+
+        self.controller.set_cell_content("A1", 2)
+        self.controller.set_cell_content("A2", 3)
+        self.controller.set_cell_content("B1", 5)
+        self.controller.set_cell_content("B2", 1)
+        self.controller.set_cell_content("B6", "hola")
+        self.controller.set_cell_content("C1", "=SUM(A1:A3, B1, 1, MAX(B1, C2))")
+
+
+
     def run(self) -> None:
         running = True
         while running:
@@ -73,6 +86,8 @@ class UserInterface:
             self.renderer.display_spreadsheet()
 
 
+
+
 if __name__ == '__main__':
     ui = UserInterface()
-    ui.run()
+    ui.test()

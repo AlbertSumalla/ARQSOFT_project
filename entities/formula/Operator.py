@@ -5,6 +5,3 @@ class Operator:
 
     def get_operator(self) -> str:
         return self.operator
-
-    def set_operator(self, operator: str) -> None:
-        self.operator = operator
