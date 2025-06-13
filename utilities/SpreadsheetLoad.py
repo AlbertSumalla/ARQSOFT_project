@@ -1,6 +1,6 @@
 # utilities/SpreadsheetLoad.py
 import os
-
+from Factory.SpreadsheetFactory import SpreadsheetFactory
 from entities.exceptions.Exceptions import PathError, S2VFormatError
 
 class SpreadsheetLoad:
@@ -16,25 +16,24 @@ class SpreadsheetLoad:
         Lee el archivo línea por línea, separa por ';', e invoca
         controller.set_cell_content para cada celda no vacía.
         """
-        if not os.path.exists(filepath):
-            raise PathError(f"Archivo no encontrado: {filepath}")
-        try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                row_number = 1
-                for line in f:
-                    # Eliminar salto de línea y dividir
-                    row_content = line.rstrip('\n').split(';')
-                    for col_index, cell_text in enumerate(row_content, start=1):
-                        if cell_text != '':
-                            coord = self.int_to_string(col_index) + str(row_number)
-                            # Asigna el contenido, puede lanzar excepciones de sintaxis
-                            self.controller.set_cell_content(coord, cell_text)
-                    row_number += 1
-        except PathError:
-            raise
-        except Exception as e:
-            # Cualquier otro error en parsing indica formato inválido
-            raise S2VFormatError(str(e))
+
+        file = open(os.path.join(os.getcwd(),filepath), 'r')
+        num_rows = 0
+        while True:
+            num_rows += 1
+            line = file.readline().strip()
+            line = line.replace(" ", "")
+            row = line.split(";") #Aqui tengo un vector de (contenido) de celdas
+            for i in row:
+                letter = chr(ord('A') + num_rows)
+                coord = f"{letter}{i}"
+                self.controller.set_cell_content(coord, row[i])
+            # if line is empty
+            # end of file is reached
+            if not line:
+                break
+        file.close()
+
 
     @staticmethod
     def int_to_string(col: int) -> str:

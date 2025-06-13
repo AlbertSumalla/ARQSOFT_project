@@ -1,4 +1,5 @@
 # entities/core/SpreadsheetController.py
+import os
 from entities.core.Spreadsheet import Spreadsheet
 from entities.core.Coordinate import Coordinate
 from entities.core.Cell import Cell
@@ -7,6 +8,8 @@ from entities.content.TextContent import TextContent
 from entities.content.Formula import Formula
 from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
 from entities.exceptions.Exceptions import *
+from utilities.SpreadsheetSave import SpreadsheetSave
+from usecasesmarker.saving_spreadsheet_exception import SavingSpreadsheetException
 
 class SpreadsheetController(Spreadsheet):
     def __init__(self):
@@ -176,7 +179,38 @@ class SpreadsheetController(Spreadsheet):
     # @exception SavingSpreadSheetException if something has gone wrong while trying to write the spreadsheet into the aforementioned file
 
     def save_spreadsheet_to_file(self, s_name_in_user_dir):
-        pass
+        """
+        Tries to save the spreadsheet into a .s2v file using SpreadsheetSave.save_to_s2v.
+
+        :param s_name_in_user_dir: Local filename relative to current working dir.
+        :exception SavingSpreadsheetException: If an error occurs.
+
+        Formato .s2v:
+        - Cada fila es una línea.
+        - Celdas separadas por `;`.
+        - Cada valor se escribe tal cual: fórmulas con `=` delante, texto o número directo.
+        """
+        try:
+            file_path = os.path.join(os.getcwd(), s_name_in_user_dir)
+            # Serializar en lista de listas de strings
+            serialized = []
+            for r in range(1, self.spreadsheet.rows + 1):
+                row = []
+                for c in range(1, self.spreadsheet.cols + 1):
+                    letter = Coordinate.index_to_letter(c)
+                    coord = Coordinate.from_string(f"{letter}{r}")
+                    cell = self.spreadsheet.get_cell(coord)
+                    formula = cell.get_cell_formula()
+                    if formula is not None:
+                        row.append(f"={formula}")
+                    else:
+                        val = cell.get_cell_content()
+                        row.append(str(val) if val is not None else "")
+                serialized.append(row)
+            # Uso del método proporcionado
+            SpreadsheetSave.save_to_s2v(serialized, file_path)
+        except Exception as e:
+            raise SavingSpreadsheetException(str(e))
 
     ##@brief Tries to load the spreadsheet from a file.
     #
