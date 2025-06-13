@@ -19,62 +19,80 @@ class ShuntingYard:
         op_stack: List[Union[str, Operator]] = []
         self.ctrl.spreadsheet = spreadsheet
         
-        # Standard shunting-yard: handle numbers, cell refs, operators, functions, parentheses, argument separators
         for token in tokens:
-            # 1) Operands: numbers or cell references
+            # 1) Operands: números y referencias a celdas
             if self.factory.is_numeric(token):
-                num = self.factory.create_numeric(token)
-                output_postfix.append(num)
+                output_postfix.append(self.factory.create_numeric(token))
             elif self.factory.is_cell_reference(token):
                 val = self.ctrl.get_cell_content_as_float(token)
                 output_postfix.append(self.factory.create_numeric(str(val)))
 
-            # 2) Function names
+            # 2) Nombres de función
             elif self.factory.is_function_name(token):
                 op_stack.append(token)
 
-            # 3) Argument separators (;
-            #    Pop until left parenthesis is found
-            elif token == ',' or token == ';':
+            # 3) Separadores de argumentos
+            elif token in (',',';'):
                 while op_stack and op_stack[-1] != '(':
                     output_postfix.append(op_stack.pop())
 
-            # 4) Range operator ':' remains on stack, will be handled in function evaluation
+            # 4) Operador de rango
             elif token == ':':
                 op_stack.append(token)
 
-            # 5) Left parenthesis always pushed
+            # 5) Paréntesis izquierdo
             elif token == '(':
                 op_stack.append(token)
 
-            # 6) Right parenthesis: pop until matching '('
+            # 6) Paréntesis derecho: fin de expresión o de llamada a función
             elif token == ')':
-                # Pop operators to output until '('
+                # Desapilar hasta el último '('
                 while op_stack and op_stack[-1] != '(':  
                     output_postfix.append(op_stack.pop())
-                op_stack.pop()  # discard '('
+                op_stack.pop()  # eliminar '('
 
-                # After closing '(', if top is a function, pop it and compute immediately
+                # Si lo previo es nombre de función, recoger argumentos y expandir rangos
                 if op_stack and self.factory.is_function_name(op_stack[-1]):
                     func_name = op_stack.pop()
-
-                    # Collect args from output_postfix by reconstructing from last function call
-                    # We assume function args were already converted into numeric operands
-                    # Here, extract the last N args until a marker or start; for simplicity, we
-                    # re-run a simple scan: accumulate back until operator/function boundary
-                    args: List[Operand] = []
-                    while output_postfix and isinstance(output_postfix[-1], Operand):
+                    # Reconstruir lista de args (tokens y Operands)
+                    args: List[Union[str, Operand]] = []
+                    while output_postfix and isinstance(output_postfix[-1], (Operand)):
                         args.append(output_postfix.pop())
+                    # También puede haber ':' en op_stack, así que incorporar
+                    # Buscamos backwards en stack temporal si fuera necesario
                     args.reverse()
 
+                    # Expandir rangos dentro de args
+                    new_args: List[Operand] = []
+                    # Recorremos args original para detectar ':'
+                    for i, item in enumerate(args):
+                        if item == ':':
+                            start_ref = args[i-1]
+                            end_ref = args[i+1]
+                            cell_range = self.factory.create_cell_range(start_ref, end_ref)
+                            cells = spreadsheet.get_cells_in_range(cell_range)
+                            for cell in cells:
+                                cell_val = self.ctrl.get_cell_content_as_float(cell)
+                                new_args.append(self.factory.create_numeric(str(cell_val)))
+                    # Limpiar tokens de rango de args y añadir valores expandidos
+                    i = 0
+                    while i < len(args):
+                        if args[i] == ':':
+                            del args[i-1:i+2]
+                            i = max(i-1, 0)
+                        else:
+                            i += 1
+                    # Insertar al final los nuevos Operands
+                    args.extend(new_args)
+
+                    # Crear y evaluar función con args expandidos
                     function: Function = self.factory.create_function(func_name)
                     result: Operand = function.compute_formula(args)
                     output_postfix.append(result)
 
-            # 7) Operators
+            # 7) Operadores binarios
             elif self.factory.is_operator(token):
                 op1: Operator = self.factory.create_operator(token)
-                # While there is an operator at top with higher precedence (or equal for left-assoc)
                 while op_stack and isinstance(op_stack[-1], Operator):
                     op2: Operator = op_stack[-1]
                     if (op1.associativity == 'left' and op1.precedence <= op2.precedence) or \
@@ -85,13 +103,13 @@ class ShuntingYard:
                 op_stack.append(op1)
 
             else:
-                raise FormulaSyntaxError(f"Unknown token '{token}'")
+                raise FormulaSyntaxError(f"Token desconocido '{token}'")
 
-        # Pop any remaining operators
+        # Vaciar stack de operadores restantes
         while op_stack:
             top = op_stack.pop()
-            if top == '(' or top == ')':
-                raise FormulaSyntaxError("Mismatched parentheses in expression")
+            if top in ('(',')'):
+                raise FormulaSyntaxError("Paréntesis desajustados en expresión")
             output_postfix.append(top)
 
         return output_postfix
