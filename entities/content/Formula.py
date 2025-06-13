@@ -4,10 +4,10 @@ from ..formula.ShuntingYard import ShuntingYard
 from ..formula.PostfixEvaluator import PostfixEvaluate
 from ..formula.FormulaParse import FormulaParser
 from ..exceptions.Exceptions import *
-
+from entities.core.Spreadsheet import Spreadsheet
 
 class Formula(Content):
-    def __init__(self, formula_str: str, spreadsheet):
+    def __init__(self, formula_str: str, spreadsheet: Spreadsheet):
         self.formula_str = formula_str
         self.result = None
         self.spreadsheet = spreadsheet  # getter of spreadsheet instance
@@ -22,7 +22,7 @@ class Formula(Content):
         except Exception as e:
             raise FormulaSyntaxError(f"Syntax error: {e}")
         try:
-            postfix_exp = ShuntingYard.generate_postfix_expression(tokens_list, self.spreadsheet)
+            postfix_exp = ShuntingYard.generate_postfix_expression(ShuntingYard(), tokens_list, self.spreadsheet)
         except Exception as e:
             raise PostfixGenerationError(f"Postfix generation error {e}")
         try:
