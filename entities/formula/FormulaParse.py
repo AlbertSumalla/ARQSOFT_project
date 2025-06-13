@@ -3,7 +3,7 @@ from typing import List
 from entities.exceptions.Exceptions import FormulaSyntaxError
 
 class FormulaParser:
-    VALID_FUNCTIONS = {"SUM", "MEAN", "MIN", "MAX"}
+    VALID_FUNCTIONS = {"SUMA", "PROMEDIO", "MIN", "MAX"}
     VALID_OPERATORS = {"+", "-", "*", "/", "^"}
 
     @staticmethod
@@ -36,7 +36,7 @@ class FormulaParser:
                 if i == len(tokens)-1:
                     raise FormulaSyntaxError("Formula ends with operator.")
                 curr = 'operator'
-            elif tok == ',':
+            elif tok == ';':
                 # comma separates function args inside parens
                 if prev in (None, 'operator', 'paren_open', 'comma'):
                     raise FormulaSyntaxError("Misplaced comma.")
