@@ -6,6 +6,13 @@ from entities.exceptions.Exceptions import InvalidCellReferenceError
 class Spreadsheet:
     def __init__(self, rows: int, cols: int):
         self.cells: dict[Coordinate, Cell] = {}
+        self.rows: int = rows
+        self.cols: int = cols
+
+    def get_cols(self) ->   int:
+        return self.cols
+    def get_rows(self) -> int:
+        return self.rows
 
     def set_cell(self, coord: Coordinate, cell: Cell) -> None:
         self.cells[coord] = cell
