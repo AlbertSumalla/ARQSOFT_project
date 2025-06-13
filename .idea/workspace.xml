@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95cea4f9-55fd-46af-a355-9dd39b8d57be" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/entities/core/SpreadsheetController.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/core/SpreadsheetController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/formula/ShuntingYard.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/formula/ShuntingYard.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/functions/Function.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/functions/Function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/functions/Max.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/functions/Max.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/functions/Mean.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/functions/Mean.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/functions/Min.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/functions/Min.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/functions/Sum.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/functions/Sum.py" afterDir="false" />
-    </list>
+    <list default="true" id="95cea4f9-55fd-46af-a355-9dd39b8d57be" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -209,7 +201,7 @@
       <workItem from="1749734189653" duration="68000" />
       <workItem from="1749734316244" duration="201000" />
       <workItem from="1749814429218" duration="91000" />
-      <workItem from="1749814898265" duration="4389000" />
+      <workItem from="1749814898265" duration="4770000" />
     </task>
     <servers />
   </component>
@@ -269,7 +261,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/SpreadsheetMarkerForStudents$TestsRunner.coverage" NAME="TestsRunner Coverage Results" MODIFIED="1702803379726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
-    <SUITE FILE_PATH="coverage/Spreadsheet$TestsRunner.coverage" NAME="TestsRunner Coverage Results" MODIFIED="1749821414003" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
+    <SUITE FILE_PATH="coverage/Spreadsheet$TestsRunner.coverage" NAME="TestsRunner Coverage Results" MODIFIED="1749822178956" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
     <SUITE FILE_PATH="coverage/SpreadsheetMarkerForStudents$.coverage" NAME=" Coverage Results" MODIFIED="1702803324443" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
   </component>
 </project>
