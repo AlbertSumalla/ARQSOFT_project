@@ -42,4 +42,4 @@ class FormulaFactory:
 
     @staticmethod
     def is_function_name(token: str) -> bool:
-        return token.upper() in ('SUMA', 'MIN', 'MAX', 'PROMEDIO')
+        return token in ('SUMA', 'MIN', 'MAX', 'PROMEDIO')

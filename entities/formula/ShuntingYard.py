@@ -17,7 +17,8 @@ class ShuntingYard:
     def generate_postfix_expression(self, tokens: List[str], spreadsheet: Spreadsheet) -> List[Component]:
         output_postfix: List[Component] = []
         op_stack: List[Union[str, Operator]] = []
-
+        self.ctrl.spreadsheet = spreadsheet
+        
         # Standard shunting-yard: handle numbers, cell refs, operators, functions, parentheses, argument separators
         for token in tokens:
             # 1) Operands: numbers or cell references
