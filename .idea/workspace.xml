@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95cea4f9-55fd-46af-a355-9dd39b8d57be" name="Changes" comment="" />
+    <list default="true" id="95cea4f9-55fd-46af-a355-9dd39b8d57be" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/content/Formula.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/content/Formula.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -201,7 +204,7 @@
       <workItem from="1749734189653" duration="68000" />
       <workItem from="1749734316244" duration="201000" />
       <workItem from="1749814429218" duration="91000" />
-      <workItem from="1749814898265" duration="5079000" />
+      <workItem from="1749814898265" duration="5702000" />
     </task>
     <servers />
   </component>
@@ -253,15 +256,20 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/entities/core/SpreadsheetController.py</url>
-          <line>43</line>
-          <option name="timeStamp" value="26" />
+          <line>65</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/entities/content/Formula.py</url>
+          <line>24</line>
+          <option name="timeStamp" value="29" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/SpreadsheetMarkerForStudents$TestsRunner.coverage" NAME="TestsRunner Coverage Results" MODIFIED="1702803379726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
-    <SUITE FILE_PATH="coverage/Spreadsheet$TestsRunner.coverage" NAME="TestsRunner Coverage Results" MODIFIED="1749822752795" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
+    <SUITE FILE_PATH="coverage/Spreadsheet$TestsRunner.coverage" NAME="TestsRunner Coverage Results" MODIFIED="1749823400691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
     <SUITE FILE_PATH="coverage/SpreadsheetMarkerForStudents$.coverage" NAME=" Coverage Results" MODIFIED="1702803324443" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
   </component>
 </project>

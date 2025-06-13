@@ -22,11 +22,11 @@ class Formula(Content):
         except Exception as e:
             raise FormulaSyntaxError(f"Syntax error: {e}")
         try:
-            postfix_exp = ShuntingYard.generate_postfix_expression(tokens_list)
+            postfix_exp = ShuntingYard.generate_postfix_expression(tokens_list, self.spreadsheet)
         except Exception as e:
             raise PostfixGenerationError(f"Postfix generation error {e}")
         try:
-            self.result = PostfixEvaluate.evaluate_postfix_expression(postfix_exp, self.spreadsheet)
+            self.result = PostfixEvaluate.evaluate_postfix_expression(postfix_exp)
         except DivisionByZeroError as e:
             raise e
         except InvalidCellReferenceError as e:
