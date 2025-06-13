@@ -1,4 +1,4 @@
-from Coordinate import Coordinate
+from entities.core.Coordinate import Coordinate
 
 class CellRange:
     def __init__(self, start: Coordinate, end: Coordinate) -> None:
