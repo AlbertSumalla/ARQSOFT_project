@@ -9,8 +9,8 @@ import numpy as np
 
 
 class MAX(Function):
-    def compute_formula(arguments: List[Argument]) -> NumericValue:
+    def compute_formula(arguments: List[NumericValue]) -> NumericValue:
 
-        result = np.max([arg.get_value() for arg in arguments])
+        result = np.max([arg.getValue() for arg in arguments])
         result_num = FormulaFactory.create_numeric(str(result))
         return result_num

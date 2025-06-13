@@ -9,8 +9,8 @@ import numpy as np
 
 
 class SUM(Function):
-    def compute_formula(arguments: List[Argument]) -> NumericValue:
+    def compute_formula(arguments: List[NumericValue]) -> NumericValue:
 
-        result = np.sum([arg.get_value() for arg in arguments])
+        result = np.sum([arg.getValue() for arg in arguments])
         result_num = FormulaFactory.create_numeric(str(result))
         return result_num

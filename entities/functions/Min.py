@@ -9,8 +9,8 @@ import numpy as np
 
 
 class MIN(Function):
-    def compute_formula(arguments: List[Argument]) -> NumericValue:
+    def compute_formula(arguments: List[NumericValue]) -> NumericValue:
 
-        result = np.min([arg.get_value() for arg in arguments])
+        result = np.min([arg.getValue() for arg in arguments])
         result_num = FormulaFactory.create_numeric(str(result))
         return result_num
