@@ -1,4 +1,3 @@
-# entities/formula/ShuntingYard.py
 from typing import List, Union
 from entities.formula.Operand import Operand
 from entities.formula.Operator import Operator
@@ -7,94 +6,91 @@ from entities.core.Spreadsheet import Spreadsheet
 from entities.Factory.FormulaFactory import FormulaFactory
 from entities.exceptions.Exceptions import FormulaSyntaxError
 
-Component = Union[Operand,Operator]
+Component = Union[Operand, Operator]
 
-class ShuntingYard:   
+class ShuntingYard:
     def __init__(self):
         self.factory = FormulaFactory()
         from entities.core.SpreadsheetController import SpreadsheetController
         self.ctrl = SpreadsheetController()
 
     def generate_postfix_expression(self, tokens: List[str], spreadsheet: Spreadsheet) -> List[Component]:
-        output_postfix: List[Union[Operand,Operator]] = []
-        op_stack: List[str | Operator] = []
-        in_funct = False
-        open_par = 0
+        output_postfix: List[Component] = []
+        op_stack: List[Union[str, Operator]] = []
+
+        # Standard shunting-yard: handle numbers, cell refs, operators, functions, parentheses, argument separators
         for token in tokens:
+            # 1) Operands: numbers or cell references
+            if self.factory.is_numeric(token):
+                num = self.factory.create_numeric(token)
+                output_postfix.append(num)
+            elif self.factory.is_cell_reference(token):
+                val = self.ctrl.get_cell_content_as_float(token)
+                output_postfix.append(self.factory.create_numeric(str(val)))
 
-            if self.factory.is_function_name(token):
-                in_funct = True
-                op_stack.append(token)             
-            
+            # 2) Function names
+            elif self.factory.is_function_name(token):
+                op_stack.append(token)
+
+            # 3) Argument separators (;
+            #    Pop until left parenthesis is found
+            elif token == ',' or token == ';':
+                while op_stack and op_stack[-1] != '(':
+                    output_postfix.append(op_stack.pop())
+
+            # 4) Range operator ':' remains on stack, will be handled in function evaluation
             elif token == ':':
-                op_stack.append(token) 
+                op_stack.append(token)
 
+            # 5) Left parenthesis always pushed
             elif token == '(':
                 op_stack.append(token)
-                open_par += 1
 
+            # 6) Right parenthesis: pop until matching '('
             elif token == ')':
-                open_par -= 1
-                if open_par == 0:
-                    in_funct = False
-                # respectem sangria de cada funcio
-                args: List[Union[str, Operand]] = []
+                # Pop operators to output until '('
+                while op_stack and op_stack[-1] != '(':  
+                    output_postfix.append(op_stack.pop())
+                op_stack.pop()  # discard '('
 
-                while op_stack and op_stack[-1] != '(':  # recolecta arguments
-                    args.append(op_stack.pop())
-                op_stack.pop()  # eliminar '('
+                # After closing '(', if top is a function, pop it and compute immediately
+                if op_stack and self.factory.is_function_name(op_stack[-1]):
+                    func_name = op_stack.pop()
 
-                func_name = op_stack.pop()  # quitamos el nombre de la función
-                args.reverse() # revertim ordre
-                new_args = []
-                for i,item in enumerate(args):
-                    if item == ':':
-                        cell_range = self.factory.create_cell_range(args[i-1], args[i+1])
-                        list_cells = spreadsheet.get_cells_in_range(cell_range) # llista de celes en range
-                        for element in list_cells: 
-                            cell_content = self.ctrl.get_cell_content_as_float(element)
-                            new_args.append(self.factory.create_numeric(str(cell_content)))
-                i = 0
-                while i < len(args): # borrar rango i appendear new_args
-                    if args[i] == ':':
-                        del args[i-1:i+2]
-                        i = max(i-1, 0)
-                    else:
-                        i += 1
-                for ele in new_args: # append NumericValues de range
-                    args.append(ele)
+                    # Collect args from output_postfix by reconstructing from last function call
+                    # We assume function args were already converted into numeric operands
+                    # Here, extract the last N args until a marker or start; for simplicity, we
+                    # re-run a simple scan: accumulate back until operator/function boundary
+                    args: List[Operand] = []
+                    while output_postfix and isinstance(output_postfix[-1], Operand):
+                        args.append(output_postfix.pop())
+                    args.reverse()
 
-                function = self.factory.create_function(func_name) 
-                op_result = function.compute_formula(args) # numericValue
-                args.clear() # netejar args
-                
-                if in_funct == False:
-                    output_postfix.append(op_result) 
-                    op_stack.clear()
-                else:
-                    op_stack.append(op_result)
-                continue
-                    
-            elif self.factory.is_operator(token): # if its an operator
-                output_postfix.append(self.factory.create_operator(token)) # append an Operator
+                    function: Function = self.factory.create_function(func_name)
+                    result: Operand = function.compute_formula(args)
+                    output_postfix.append(result)
 
-            elif self.factory.is_numeric(token): # if its a number
-                num = self.factory.create_numeric(token)
-                if in_funct == False:
-                    output_postfix.append(num)  # append an operand NumericValue
-                else:
-                    op_stack.append(num)  # append an operand NumericValue to the stack for function processing
+            # 7) Operators
+            elif self.factory.is_operator(token):
+                op1: Operator = self.factory.create_operator(token)
+                # While there is an operator at top with higher precedence (or equal for left-assoc)
+                while op_stack and isinstance(op_stack[-1], Operator):
+                    op2: Operator = op_stack[-1]
+                    if (op1.associativity == 'left' and op1.precedence <= op2.precedence) or \
+                       (op1.associativity == 'right' and op1.precedence < op2.precedence):
+                        output_postfix.append(op_stack.pop())
+                        continue
+                    break
+                op_stack.append(op1)
 
-            elif self.factory.is_cell_reference(token): # if its a cell reference (diferenciem rango i cell ref)
-                if in_funct == False:
-                    cell_content = self.ctrl.get_cell_content_as_float(token) # !!!! 
-                    output_postfix.append(self.factory.create_numeric(str(cell_content)))  # append an operand NumericValue
-                else:
-                    cell_content = self.ctrl.get_cell_content_as_float(token) # !!!! no se si aixo funcionara
-                    op_stack.append(self.factory.create_numeric(str(cell_content)))  # append an operand NumericValue
+            else:
+                raise FormulaSyntaxError(f"Unknown token '{token}'")
+
+        # Pop any remaining operators
         while op_stack:
-            op_stack.pop()
-        return output_postfix                     
-    
-    
-   
+            top = op_stack.pop()
+            if top == '(' or top == ')':
+                raise FormulaSyntaxError("Mismatched parentheses in expression")
+            output_postfix.append(top)
+
+        return output_postfix

@@ -3,46 +3,42 @@ from entities.formula.Operand import Operand
 from entities.formula.Operator import Operator
 from entities.exceptions.Exceptions import DivisionByZeroError
 from entities.functions.NumericValue import NumericValue
+from entities.exceptions.Exceptions import DivisionByZeroError, FormulaSyntaxError
 
-Component = Union[Operand, NumericValue]
 
+Component = Union[Operator, Operand, NumericValue]
+
+class PostfixEvaluate:
     ##
     # @brief Evaluates a postfix expression to extract its result.
     # @param postfix_exp: Postfix expression that has to be resolved.
     # @exception DivisionByZeroError Raised on division by zero.
     # @return Result: Float value after computing the evaluation.
-class PostfixEvaluate:
     @staticmethod
     def evaluate_postfix_expression(postfix_exp: List[Component]) -> float:
-
         stack: List[float] = []
+
         for comp in postfix_exp:
-            if isinstance(comp, NumericValue):
-                # push operand's numeric value via get_value()
+            if isinstance(comp, Operand):
                 stack.append(comp.getValue())
+
+            # Operador: desapilar dos operandos y aplicar
             elif isinstance(comp, Operator):
-                # pop operands (right then left)
+                if len(stack) < 2:
+                    raise FormulaSyntaxError("Insufficient operands for operator")
                 right = stack.pop()
-                left = stack.pop()
+                left  = stack.pop()
                 try:
-                    result = PostfixEvaluate.apply(comp, left, right)
+                    result = comp.apply(left, right)
                 except ZeroDivisionError:
-                    raise DivisionByZeroError("Division by zero during evaluation")
+                    raise DivisionByZeroError("Division por cero durante la evaluación")
                 stack.append(result)
+
             else:
-                continue
+                # No debería suceder si ShuntingYard produce solo Operands y Operators
+                raise FormulaSyntaxError(f"Token desconocido en postfijo: {comp}")
 
-        return stack[0] # Resultado final
+        if len(stack) != 1:
+            raise FormulaSyntaxError("Expresión postfija inválida: pila final con múltiples valores")
 
-    def apply(op: Operator, left: float, right: float) -> float:
-        symbol = op.get_operator()
-        if symbol == '+':
-            return left + right
-        elif symbol == '-':
-            return left - right
-        elif symbol == '*':
-            return left * right
-        elif symbol == '/':
-            return left / right
-        elif symbol == '^':
-            return left ** right
+        return stack[0]

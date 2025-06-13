@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95cea4f9-55fd-46af-a355-9dd39b8d57be" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/entities/formula/FormulaParse.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/formula/FormulaParse.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/Factory/FormulaFactory.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/Factory/FormulaFactory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/formula/Operator.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/formula/Operator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/formula/PostfixEvaluator.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/formula/PostfixEvaluator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/formula/ShuntingYard.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/formula/ShuntingYard.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -203,7 +206,7 @@
       <workItem from="1749734189653" duration="68000" />
       <workItem from="1749734316244" duration="201000" />
       <workItem from="1749814429218" duration="91000" />
-      <workItem from="1749814898265" duration="7019000" />
+      <workItem from="1749814898265" duration="7665000" />
     </task>
     <servers />
   </component>
@@ -243,17 +246,12 @@
           <line>137</line>
           <option name="timeStamp" value="25" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/entities/content/Formula.py</url>
-          <line>24</line>
-          <option name="timeStamp" value="30" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/SpreadsheetMarkerForStudents$TestsRunner.coverage" NAME="TestsRunner Coverage Results" MODIFIED="1702803379726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
-    <SUITE FILE_PATH="coverage/Spreadsheet$TestsRunner.coverage" NAME="TestsRunner Coverage Results" MODIFIED="1749824047796" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
+    <SUITE FILE_PATH="coverage/Spreadsheet$TestsRunner.coverage" NAME="TestsRunner Coverage Results" MODIFIED="1749828604025" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
     <SUITE FILE_PATH="coverage/SpreadsheetMarkerForStudents$.coverage" NAME=" Coverage Results" MODIFIED="1702803324443" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/markerrun" />
   </component>
 </project>
