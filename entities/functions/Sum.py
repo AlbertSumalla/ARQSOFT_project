@@ -8,7 +8,7 @@ import numpy as np
 
 
 
-class SUM(Function):
+class SUMA(Function):
     def compute_formula(arguments: List[NumericValue]) -> NumericValue:
 
         result = np.sum([arg.getValue() for arg in arguments])

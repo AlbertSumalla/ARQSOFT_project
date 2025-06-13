@@ -23,3 +23,6 @@ class Function(Operand, ABC):
         elif self.type == 'MEAN':
             from entities.functions.Mean import PROMEDIO
             return PROMEDIO.compute_formula(args)
+        
+    def get_operand(self) -> float:
+        return self.type

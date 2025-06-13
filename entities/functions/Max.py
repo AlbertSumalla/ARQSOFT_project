@@ -12,3 +12,4 @@ class MAX(Function):
         result = np.max([arg.getValue() for arg in arguments])
         result_num = FormulaFactory.create_numeric(str(result))
         return result_num
+

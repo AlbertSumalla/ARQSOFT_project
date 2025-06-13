@@ -8,7 +8,7 @@ import numpy as np
 
 
 
-class MEAN(Function):
+class PROMEDIO(Function):
     def compute_formula(arguments: List[NumericValue]) -> NumericValue:
 
         result = np.mean([arg.getValue() for arg in arguments])

@@ -4,19 +4,20 @@ from entities.functions.Function import Function
 from entities.core.CellRange import CellRange
 from entities.core.Coordinate import Coordinate
 from entities.formula.Operator import Operator
-
 class FormulaFactory:
-    @staticmethod
-    def create_function(name: str) -> Function:
+    def __init__(self):
+        pass
+
+    def create_function(self, name: str) -> Function:
         return Function(name)
 
-    def create_numeric(value: str) -> NumericValue:
+    def create_numeric(self, value: str) -> NumericValue:
         return NumericValue(float(value))
 
-    def create_cell_range(start: str, end: str) -> CellRange:
+    def create_cell_range(self, start: str, end: str) -> CellRange:
         return CellRange(start, end)
 
-    def create_operator(op: str) -> Operator:
+    def create_operator(self, op: str) -> Operator:
         return Operator(op)
 
     @staticmethod
