@@ -63,7 +63,7 @@ class SpreadsheetController(Spreadsheet):
         
         # Evaluate if is a formula and save cell. if not, just save the content
         if ctype in ("FORMULA"): 
-            result = content_obj.get_content(formula, self.spreadsheet) #float del result of evaluation
+            result = content_obj.get_content() #float del result of evaluation
             cell = self.factory.create_cell(coord_obj, result)
             cell.store_formula(cell, formula)
         else: # Si no es formula, guardem el contingut a la cell directament
