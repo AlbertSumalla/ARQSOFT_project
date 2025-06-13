@@ -3,6 +3,7 @@ from typing import List, Union
 from entities.formula.Operand import Operand
 from entities.formula.Operator import Operator
 from entities.functions.Function import Function
+from entities.core.Spreadsheet import Spreadsheet
 from entities.Factory.FormulaFactory import FormulaFactory
 from entities.exceptions.Exceptions import FormulaSyntaxError
 from entities.core.SpreadsheetController import SpreadsheetController
@@ -14,12 +15,11 @@ class ShuntingYard:
         self.factory = FormulaFactory()
         self.ctrl = SpreadsheetController()
                
-    
-    def generate_postfix_expression(self, tokens: List[str], spreadsheet) -> List[Component]:
+    def generate_postfix_expression(self, tokens: List[str], spreadsheet: Spreadsheet) -> List[Component]:
         output_postfix: List[Union[Operand,Operator]] = []
         op_stack: List[str | Operator] = []
         in_funct = False
-        
+        parenthesis_opened = 0
         for i, token in enumerate(tokens):
             next_token = tokens[i+1] if i+1 < len(tokens) else None # mirem el next token
 
@@ -27,25 +27,52 @@ class ShuntingYard:
                 in_funct = True
                 op_stack.append(token)             
             
-            if in_funct == True: # si es una funcio
-                if token == '(':
-                    op_stack.append(token)
+            elif token == '(':
+                op_stack.append(token)
+                parenthesis_opened += 1
+
+            elif token == ',':
+                op_stack.append(token)
+
+            elif token == ')':
+                # codigo que falta
+                op_stack.append(token)
+                parenthesis_opened -= 1
+                if parenthesis_opened == 0:
                     pass
-                
-            # dema entendre com gestionar op_stack i amb un while computar les funcions internes, crec que es lo millor.
-            else:
-                if self.factory.is_operator(token): # if its an operator
-                    output_postfix.append(self.factory.create_operator(token)) # append an Operator
+                    
 
-                elif self.factory.is_numeric(token): # if its a number
-                    output_postfix.append(self.factory.create_numeric(token))  # append an operand NumericValue
-                
-                elif self.factory.is_cell_reference(token): # if its a cell reference
-                    cell_content = self.ctrl.get_cell_content_as_float(token) # !!!! no se si aixo funcionara
+
+            elif self.factory.is_operator(token): # if its an operator
+                output_postfix.append(self.factory.create_operator(token)) # append an Operator
+
+            elif self.factory.is_numeric(token): # if its a number
+                num = self.factory.create_numeric(token)
+                if in_funct == False:
+                    output_postfix.append(num)  # append an operand NumericValue
+                else:
+                    op_stack.append(num)  # append an operand NumericValue to the stack for function processing
+
+            elif self.factory.is_cell_reference(token): # if its a cell reference (diferenciem rango i cell ref)
+                if in_funct == False:
+                    cell_content = self.ctrl.get_cell_content_as_float(token) # !!!! 
                     output_postfix.append(self.factory.create_numeric(str(cell_content)))  # append an operand NumericValue
-
-        
-                
+                else:
+                    if next_token == ':': # Estem a un rango 
+                        range = self.factory.create_cell_range(token, tokens[i+2])
+                        list_cells = spreadsheet.get_cells_in_range(self, range) # llista de celes en range
+                        for element in list_cells: 
+                            op_stack.append(self.ctrl.get_cell_content_as_float(element)) # el posem a el stack
+                    else: # es una cell reference normal
+                        cell_content = self.ctrl.get_cell_content_as_float(token) # !!!! no se si aixo funcionara
+                        output_postfix.append(self.factory.create_numeric(str(cell_content)))  # append an operand NumericValue
+                        
+    
+    
+    
+    
+    
+    
     def generate_postfix_expression(tokens: List[str], spreadsheet) -> List[Component]:
         output_queue: List[Component] = []
         op_stack: List[Union[str, Operator, Function]] = []
