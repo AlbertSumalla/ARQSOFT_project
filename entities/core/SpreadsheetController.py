@@ -122,7 +122,10 @@ class SpreadsheetController(Spreadsheet):
                 try:
                     return float(str(cell_content)) # S'intenta extreure el valor numéric del text
                 except ValueError:
-                    raise NoNumberException(f"Cell content '{cell_content}' is not a number")
+                    if cell_content == "":
+                        return 0
+                    else:
+                        raise NoNumberException(f"Cell '{cell_content}' has no number.")
             elif ctype == "NUM":
                 return float(cell_content) # Si es un numero, retornem directament el valor numéric
 

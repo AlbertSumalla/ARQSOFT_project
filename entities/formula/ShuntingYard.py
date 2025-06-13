@@ -25,10 +25,7 @@ class ShuntingYard:
                 output_postfix.append(self.factory.create_numeric(token))
             elif self.factory.is_cell_reference(token):
                 print(f"Token '{token}'")
-                try:
-                    val = self.ctrl.get_cell_content_as_float(token)
-                except Exception:
-                    val = 0.0
+                val = self.ctrl.get_cell_content_as_float(token)
                 output_postfix.append(self.factory.create_numeric(str(val)))
 
             # 2) Nombres de función
