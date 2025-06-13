@@ -16,7 +16,7 @@ class SpreadsheetController(Spreadsheet):
         self.factory = SpreadsheetFactory()
         self.spreadsheet = None
 
-    def create_spreadsheet(self, rows: int, cols:int) -> None:
+    def create_spreadsheet(self, rows: int, cols: int) -> Spreadsheet:
         self.spreadsheet = self.factory.create_spreadsheet(rows, cols)
 
         for r in range(1, rows + 1):
@@ -25,6 +25,7 @@ class SpreadsheetController(Spreadsheet):
                 coord = Coordinate.from_string(f"{letter}{r}")
                 cell = self.factory.create_cell(coord, "")
                 self.spreadsheet.set_cell(coord, cell)
+        return self.spreadsheet
 
 
     ##@brief Tries to set the content of a cell of the spreadsheet in a certain coordinate. See complete specification below following the link.

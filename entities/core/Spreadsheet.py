@@ -11,6 +11,7 @@ class Spreadsheet:
 
     def get_cols(self) ->   int:
         return self.cols
+    
     def get_rows(self) -> int:
         return self.rows
 
