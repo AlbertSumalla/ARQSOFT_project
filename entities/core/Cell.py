@@ -22,5 +22,5 @@ class Cell:
     # @param cell: The target cell.
     # @param result The computed result to store.
     # @return None.
-    def store_result(cell, result):
-        cell.content = result
+    def store_formula(cell, formula):
+        cell.content = formula
