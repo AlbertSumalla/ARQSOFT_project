@@ -1,15 +1,16 @@
-from typing import List , Union
+from typing import List
 from Argument import Argument
 from Function import Function
+from entities.formula.Operand import Operand
 from NumericValue import NumericValue
+from entities.Factory.FormulaFactory import FormulaFactory
 
+import numpy as np
 
-# Definimos un alias para tipos numéricos
-Number = Union[int, float]
 
 class MEAN(Function):
-    def compute_formula(self, arguments: List[Argument]) -> Number:
-        total = sum(arg.get_value() for arg in arguments)
-        count = len(arguments)
-        self.result = total / count if count else 0
-        return self.result
+    def compute_formula(arguments: List[Argument]) -> NumericValue:
+
+        result = np.mean([arg.get_value() for arg in arguments])
+        result_num = FormulaFactory.create_numeric(str(result))
+        return result_num

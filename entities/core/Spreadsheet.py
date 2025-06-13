@@ -13,6 +13,7 @@ class Spreadsheet:
     def get_cell(self, coord: Coordinate) -> Cell:
         return self.cells.get(coord)
 
+
     def get_cells_in_range(self, cell_range: CellRange) -> list[Cell]:
         start = cell_range.get_start()
         end   = cell_range.get_end()

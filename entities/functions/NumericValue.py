@@ -1,6 +1,7 @@
-from ..formula.Operand import Operand
+from entities.formula.Operand import Operand
+from entities.functions.Argument import Argument
 
-class NumericValue(Operand):
+class NumericValue(Operand,Argument):
     def __init__(self, value: float):
         self.value = value
 

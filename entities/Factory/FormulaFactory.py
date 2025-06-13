@@ -7,8 +7,8 @@ from entities.formula.Operator import Operator
 
 class FormulaFactory:
     @staticmethod
-    def create_function(name: str, args: List) -> Function:
-        return Function(name, args)
+    def create_function(name: str) -> Function:
+        return Function(name)
 
     def create_numeric(value: str) -> NumericValue:
         return NumericValue(float(value))
