@@ -6,7 +6,7 @@ from entities.content.NumericContent import NumericContent
 from entities.content.TextContent import TextContent
 from entities.content.Formula import Formula
 from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
-from exceptions.Exceptions import *
+from entities.exceptions.Exceptions import *
 
 class SpreadsheetController(Spreadsheet):
     def __init__(self):

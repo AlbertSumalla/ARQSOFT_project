@@ -6,13 +6,13 @@ from entities.functions.Function import Function
 from entities.core.Spreadsheet import Spreadsheet
 from entities.Factory.FormulaFactory import FormulaFactory
 from entities.exceptions.Exceptions import FormulaSyntaxError
-from entities.core.SpreadsheetController import SpreadsheetController
 
 Component = Union[Operand,Operator]
 
 class ShuntingYard:   
     def __init__(self):
         self.factory = FormulaFactory()
+        from entities.core.SpreadsheetController import SpreadsheetController
         self.ctrl = SpreadsheetController()
 
     def generate_postfix_expression(self, tokens: List[str], spreadsheet: Spreadsheet) -> List[Component]:
