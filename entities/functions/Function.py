@@ -11,7 +11,7 @@ class Function(Operand, ABC):
 
     def compute_formula(self, args: List[Argument]) -> NumericValue:
         # imports locales para evitar circularidad
-        if self.type == 'SUM':
+        if self.type == 'SUMA':
             from entities.functions.Sum import SUMA
             return SUMA.compute_formula(args)
         elif self.type == 'MAX':
@@ -20,7 +20,7 @@ class Function(Operand, ABC):
         elif self.type == 'MIN':
             from entities.functions.Min import MIN
             return MIN.compute_formula(args)
-        elif self.type == 'MEAN':
+        elif self.type == 'PROMEDIO':
             from entities.functions.Mean import PROMEDIO
             return PROMEDIO.compute_formula(args)
         

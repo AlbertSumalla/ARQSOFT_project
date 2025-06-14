@@ -9,7 +9,7 @@ class Tokenizer:
         r'[A-Za-z]+[0-9]+|'    # cell references, e.g. A1, AB12
         r'[A-Za-z_]\w*(?=\()|' # function names (letters+digits) before '('
         r'[A-Za-z_]\w*|'       # standalone words (if you ever support named constants)
-        r'[+\-*/^(),:]'        # operators and punctuation
+        r'[+\-*/^();:]'        # operators and punctuation
     )
 
     @staticmethod
