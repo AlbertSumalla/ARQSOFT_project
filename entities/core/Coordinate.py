@@ -22,7 +22,7 @@ class Coordinate:
     
     @staticmethod
     def index_to_letter(i: int) -> str:
-        return chr(ord('A') + i - 1)
+        return chr(ord('A') + i)
     
     @classmethod
     def from_string(cls, s: str) -> "Coordinate":

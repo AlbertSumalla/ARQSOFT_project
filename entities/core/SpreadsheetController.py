@@ -10,6 +10,7 @@ from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
 from entities.exceptions.Exceptions import *
 from utilities.SpreadsheetSave import SpreadsheetSave
 from usecasesmarker.saving_spreadsheet_exception import SavingSpreadsheetException
+from utilities.SpreadsheetLoad import SpreadsheetLoad
 
 class SpreadsheetController(Spreadsheet):
     def __init__(self):
@@ -225,5 +226,15 @@ class SpreadsheetController(Spreadsheet):
     # @exception ReadingSpreadSheetException if something has gone wrong while trying to create spreadsheet and fill
     # it with the data present within the aforementioned file.
 
+
     def load_spreadsheet_from_file(self, s_name_in_user_dir):
-        pass
+        # 1. Leer el archivo para saber el tamaño
+        matrix = SpreadsheetLoad.read_file_as_matrix(s_name_in_user_dir)
+
+        # 2. Crear spreadsheet con tamaño adecuado
+        rows = len(matrix)
+        cols = max(len(row) for row in matrix)
+        self.create_spreadsheet(rows, cols)
+
+        # 3. Rellenar contenidos usando self como controlador
+        SpreadsheetLoad.load_spreadsheet(self, s_name_in_user_dir)

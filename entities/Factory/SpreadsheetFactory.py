@@ -3,7 +3,7 @@ from entities.core.Cell import Cell
 from entities.content.NumericContent import NumericContent
 from entities.content.TextContent import TextContent
 from entities.content.Formula import Formula
-from ..exceptions.Exceptions import InvalidFunctionError
+from entities.exceptions.Exceptions import InvalidFunctionError
 
 class SpreadsheetFactory:
     def __init__(self):
