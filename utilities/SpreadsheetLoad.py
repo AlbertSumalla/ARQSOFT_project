@@ -3,6 +3,8 @@ import os
 from Factory.SpreadsheetFactory import SpreadsheetFactory
 from entities.exceptions.Exceptions import PathError, S2VFormatError
 from entities.core.Coordinate import Coordinate
+from entities.exceptions.Exceptions import DivisionByZeroError
+
 
 class SpreadsheetLoad:
     """
@@ -32,9 +34,28 @@ class SpreadsheetLoad:
                     break
                 row = line.split(";")
                 for col_index, content in enumerate(row):
-                    if content != "":
-                        coord = Coordinate.index_to_letter(col_index) + str(row_index + 1)
-                        controller.set_cell_content(coord, content)
+                    if content == "":
+                        continue
+
+                    coord = Coordinate.index_to_letter(col_index) + str(row_index + 1)
+
+                    # 1) volvemos a punto y coma los args de las fórmulas
+                    content_norm = content
+                    if content_norm.startswith('='):
+                        content_norm = content_norm.replace(',', ';')
+
+                    try:
+                        # 2) intentamos la carga normal (que internamente evalúa)
+                        controller.set_cell_content(coord, content_norm)
+
+                    except DivisionByZeroError:
+                        # 3) si da división por cero, guardo solo la fórmula (sin evaluar)
+                        coord_obj = Coordinate.from_string(coord)
+                        formula_str = content_norm[1:]  # sin el '=' inicial
+                        # celda con valor dummy (0) y fórmula
+                        cell = controller.factory.create_cell(coord_obj, 0.0)
+                        cell.formula = formula_str
+                        controller.spreadsheet.set_cell(coord_obj, cell)
 
     @staticmethod
     def int_to_string(col: int) -> str:
