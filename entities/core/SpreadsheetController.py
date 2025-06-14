@@ -17,15 +17,8 @@ class SpreadsheetController(Spreadsheet):
         self.factory = SpreadsheetFactory()
         self.spreadsheet = None
 
-    def create_spreadsheet(self, rows: int, cols: int) -> Spreadsheet:
-        self.spreadsheet = self.factory.create_spreadsheet(rows, cols)
-
-        for r in range(1, rows + 1):
-            for c in range(1, cols + 1):
-                letter = Coordinate.index_to_letter(c)
-                coord = Coordinate.from_string(f"{letter}{r}")
-                cell = self.factory.create_cell(coord, "")
-                self.spreadsheet.set_cell(coord, cell)
+    def create_spreadsheet(self) -> Spreadsheet:
+        self.spreadsheet = self.factory.create_spreadsheet()
         return self.spreadsheet
 
 

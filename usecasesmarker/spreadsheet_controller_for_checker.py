@@ -12,7 +12,7 @@ class ISpreadsheetControllerForChecker:
 class SpreadsheetControllerForChecker(ISpreadsheetControllerForChecker):
     def __init__(self):
         self._ctrl = SpreadsheetController()
-        self._ctrl.create_spreadsheet(25,25)
+        self._ctrl.create_spreadsheet()
 
     def set_cell_content(self, coord, str_content):
         try:

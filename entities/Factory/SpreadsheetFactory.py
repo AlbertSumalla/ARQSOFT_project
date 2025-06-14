@@ -9,8 +9,8 @@ class SpreadsheetFactory:
     def __init__(self):
         pass
 
-    def create_spreadsheet(self, rows: int, cols: int) -> Spreadsheet:
-        return Spreadsheet(rows, cols)
+    def create_spreadsheet(self) -> Spreadsheet:
+        return Spreadsheet()
 
     def create_cell(self, coordinate, content) -> Cell:
         return Cell(coordinate, content)
