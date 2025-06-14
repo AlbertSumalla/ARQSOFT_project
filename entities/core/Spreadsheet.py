@@ -2,30 +2,21 @@ from ..core.Cell import Cell
 from entities.core.Coordinate import Coordinate
 from entities.core.CellRange import CellRange
 from entities.exceptions.Exceptions import InvalidCellReferenceError
-from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
 
 
 class Spreadsheet:
     def __init__(self):
         self.cells: dict[Coordinate, Cell] = {}
-<<<<<<< Updated upstream
         from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
         self.factory = SpreadsheetFactory
-=======
->>>>>>> Stashed changes
 
     def set_cell(self, coord: Coordinate, cell: Cell) -> None:
         self.cells[coord] = cell # afegim cell unilateralment a la posicio de Coord, estigui o no.
         
         col_num_id = Coordinate.column_to_number(coord.column_id)  # posicio columna pero en numero      
         for col in range(1,col_num_id): # Recursivament busquem cells de 1 a col_num_cells i creem cel·les buides si no existeixen
-<<<<<<< Updated upstream
             new_coord = self.factory.create_coordinate(self,Coordinate.number_to_column(col),coord.row_id)
             blank_cell = self.factory.create_cell(self,new_coord,"")
-=======
-            new_coord = SpreadsheetFactory.create_coordinate(SpreadsheetFactory(),Coordinate.number_to_column(col),coord.row_id)
-            blank_cell = SpreadsheetFactory.create_cell(SpreadsheetFactory(),new_coord,"")
->>>>>>> Stashed changes
             if new_coord not in self.cells:
                 self.cells[new_coord] = blank_cell
 

@@ -25,6 +25,9 @@ class SpreadsheetSave:
                     # Write each cell followed by a semicolon
                     for cell in row:
                         cell_str = str(SpreadsheetSave.smart_value(cell))
+                        # si es fórmula, cambiamos ; internos por ,
+                        if cell_str.startswith('='):
+                            cell_str = cell_str.replace(';', ',')
                         f.write(cell_str)
                         f.write(';')
                     # End of row

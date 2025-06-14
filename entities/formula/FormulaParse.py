@@ -63,6 +63,7 @@ class FormulaParser:
             return 'range'
         if re.fullmatch(r"[A-Za-z]+\d+", tok):
             return 'reference'
-        if tok in ('(', ')', ','):
-            return tok
+        if tok in ('(', ')', ',', ';'):
+        # tratamos ';' igual que ',' para separar args de función
+            return ','
         return 'invalid'
