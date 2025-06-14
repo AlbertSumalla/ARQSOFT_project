@@ -240,9 +240,7 @@ class SpreadsheetController(Spreadsheet):
         matrix = SpreadsheetLoad.read_file_as_matrix(s_name_in_user_dir)
 
         # 2. Crear spreadsheet con tamaño adecuado
-        rows = len(matrix)
-        cols = max(len(row) for row in matrix)
-        self.create_spreadsheet(rows, cols)
+        self.create_spreadsheet()
 
         # 3. Rellenar contenidos usando self como controlador
         SpreadsheetLoad.load_spreadsheet(self, s_name_in_user_dir)

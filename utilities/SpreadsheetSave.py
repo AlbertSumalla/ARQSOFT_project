@@ -24,7 +24,8 @@ class SpreadsheetSave:
                 for row in serial_rows:
                     # Write each cell followed by a semicolon
                     for cell in row:
-                        f.write(str(smart_value(cell)))
+                        cell_str = str(SpreadsheetSave.smart_value(cell))
+                        f.write(cell_str)
                         f.write(';')
                     # End of row
                     f.write('\n')
@@ -32,8 +33,26 @@ class SpreadsheetSave:
             # Wrap any IO error in PathError
             raise PathError(str(e))
 
+    @staticmethod
     def smart_value(x):
-        # en Python, float.is_integer() devuelve True si x tiene .0
-        if isinstance(x, float) and x.is_integer():
-            return int(x)
+        # si ya es float, lo dejamos listo para chequear .is_integer()
+        if isinstance(x, float):
+            if x.is_integer():
+                return int(x)
+            return x
+
+        # si es una cadena, intentamos convertirla a float
+        if isinstance(x, str):
+            try:
+                num = float(x)
+            except ValueError:
+                # no es un número ("=SUMA(A1:A2)", "hola", etc.)
+                return x
+            else:
+                # si tras parsear a float sale entero, devolvemos int
+                if num.is_integer():
+                    return int(num)
+                return num
+
+        # cualquier otro tipo (int, Decimal, etc.)
         return x
