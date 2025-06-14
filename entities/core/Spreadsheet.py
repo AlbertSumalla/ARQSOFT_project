@@ -4,10 +4,8 @@ from entities.core.CellRange import CellRange
 from entities.exceptions.Exceptions import InvalidCellReferenceError
 
 class Spreadsheet:
-    def __init__(self, rows: int, cols: int):
+    def __init__(self):
         self.cells: dict[Coordinate, Cell] = {}
-        self.rows: int = rows
-        self.cols: int = cols
 
     def get_cols(self) ->   int:
         return self.cols
@@ -20,7 +18,6 @@ class Spreadsheet:
 
     def get_cell(self, coord: Coordinate) -> Cell:
         return self.cells.get(coord)
-
 
     def get_cells_in_range(self, cell_range: CellRange) -> list[Cell]:
         start = cell_range.get_start()

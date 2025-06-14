@@ -1,5 +1,6 @@
 # entities/core/SpreadsheetController.py
 import os
+from collections import defaultdict
 from entities.core.Spreadsheet import Spreadsheet
 from entities.core.Coordinate import Coordinate
 from entities.core.Cell import Cell
@@ -106,7 +107,8 @@ class SpreadsheetController(Spreadsheet):
             cell = self.spreadsheet.get_cell(coord_obj)  
         except Exception:
             raise BadCoordinateException(f"No cell on this coordinate: {coord}")
-        
+        if cell is None:
+            return 0
         formula = cell.get_cell_formula()
         if  formula is not None:
             return cell.get_cell_content() #retornem el resultat de la formula
@@ -188,23 +190,36 @@ class SpreadsheetController(Spreadsheet):
         - Celdas separadas por `;`.
         - Cada valor se escribe tal cual: fórmulas con `=` delante, texto o número directo.
         """
+        # 1) Calculamos cuántas columnas útiles hay en cada fila:
+        row_max_col = defaultdict(int)
+        for coord in self.spreadsheet.cells:
+            col_idx = Coordinate.column_to_number(coord.column_id)
+            row_max_col[coord.row_id] = max(row_max_col[coord.row_id], col_idx + 1)
+
         try:
             file_path = os.path.join(os.getcwd(), s_name_in_user_dir)
-            # Serializar en lista de listas de strings
             serialized = []
-            for r in range(1, self.spreadsheet.rows + 1):
-                row = []
-                for c in range(1, self.spreadsheet.cols + 1):
+
+            # 2) Recorro cada fila en orden
+            for row in sorted(row_max_col):
+                max_col = row_max_col[row]-1
+                row_list = []
+                # de 0..max_col-1
+                for c in range(max_col):
                     letter = Coordinate.index_to_letter(c)
-                    coord = Coordinate.from_string(f"{letter}{r}")
-                    cell = self.spreadsheet.get_cell(coord)
-                    formula = cell.get_cell_formula()
-                    if formula is not None:
-                        row.append(f"={formula}")
+                    cell_coord = Coordinate(letter, row)
+                    cell = self.spreadsheet.get_cell(cell_coord)
+
+                    if cell is None:
+                        row_list.append("")
                     else:
-                        val = cell.get_cell_content()
-                        row.append(str(val) if val is not None else "")
-                serialized.append(row)
+                        formula = cell.get_cell_formula()
+                        if formula is not None:
+                            row_list.append(f"={formula}")
+                        else:
+                            val = cell.get_cell_content()
+                            row_list.append(str(val) if val is not None else "")
+                serialized.append(row_list)
             # Uso del método proporcionado
             SpreadsheetSave.save_to_s2v(serialized, file_path)
         except Exception as e:
@@ -231,3 +246,4 @@ class SpreadsheetController(Spreadsheet):
 
         # 3. Rellenar contenidos usando self como controlador
         SpreadsheetLoad.load_spreadsheet(self, s_name_in_user_dir)
+

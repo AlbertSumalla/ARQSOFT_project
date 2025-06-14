@@ -24,10 +24,16 @@ class SpreadsheetSave:
                 for row in serial_rows:
                     # Write each cell followed by a semicolon
                     for cell in row:
-                        f.write(str(cell))
+                        f.write(str(smart_value(cell)))
                         f.write(';')
                     # End of row
                     f.write('\n')
         except Exception as e:
             # Wrap any IO error in PathError
             raise PathError(str(e))
+
+    def smart_value(x):
+        # en Python, float.is_integer() devuelve True si x tiene .0
+        if isinstance(x, float) and x.is_integer():
+            return int(x)
+        return x

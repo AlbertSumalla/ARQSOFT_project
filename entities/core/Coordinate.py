@@ -7,12 +7,6 @@ class Coordinate:
         self.column_id = column_id
         self.row_id = row_id
 
-    def column_to_number(self) -> int:
-        total = 0
-        for char in self.column_id:
-            total = total * 26 + (ord(char) - ord('A') + 1)
-        return total
-
 
     def __eq__(self, other):
         return (
@@ -26,7 +20,14 @@ class Coordinate:
 
     def __str__(self):
         return f"{self.column_id}{self.row_id}"
-    
+
+    @staticmethod
+    def column_to_number(col: str) -> int:
+        total = 0
+        for char in col:
+            total = total * 26 + (ord(char) - ord('A') + 1)
+        return total
+
     @staticmethod
     def index_to_letter(i: int) -> str:
         return chr(ord('A') + i)
