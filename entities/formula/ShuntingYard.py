@@ -24,7 +24,6 @@ class ShuntingYard:
             if self.factory.is_numeric(token):
                 output_postfix.append(self.factory.create_numeric(token))
             elif self.factory.is_cell_reference(token):
-                print(f"Token '{token}'")
                 val = self.ctrl.get_cell_content_as_float(token)
                 output_postfix.append(self.factory.create_numeric(str(val)))
 
@@ -33,7 +32,7 @@ class ShuntingYard:
                 op_stack.append(token)
 
             # 3) Separadores de argumentos
-            elif token in (',',';'):
+            elif token == ';':
                 while op_stack and op_stack[-1] != '(':
                     output_postfix.append(op_stack.pop())
 

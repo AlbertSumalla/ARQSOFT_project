@@ -12,12 +12,9 @@ class ISpreadsheetControllerForChecker:
 class SpreadsheetControllerForChecker(ISpreadsheetControllerForChecker):
     def __init__(self):
         self._ctrl = SpreadsheetController()
+        self._ctrl.create_spreadsheet(25,25)
 
     def set_cell_content(self, coord, str_content):
-        try:
-            self._ctrl.create_spreadsheet(rows=10, cols=10)
-        except Exception as e:
-            raise ContentException("Error creating spreadsheet: " + str(e))
         try:
             self._ctrl.set_cell_content(coord, str_content)
         except InvalidCellReferenceError:
