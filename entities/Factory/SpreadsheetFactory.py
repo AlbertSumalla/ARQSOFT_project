@@ -14,7 +14,7 @@ class SpreadsheetFactory:
         return Spreadsheet()
     
     def create_coordinate(self,col: str,row: str) -> Coordinate:
-        return 
+        return Coordinate(col,row)
 
     def create_cell(self, coordinate, content) -> Cell:
         return Cell(coordinate, content)
