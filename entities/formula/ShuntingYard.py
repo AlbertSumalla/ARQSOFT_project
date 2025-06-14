@@ -54,7 +54,7 @@ class ShuntingYard:
                         cell_val = self.factory.create_numeric(str(0))
                     else:
                         cell_val = cell.content
-                        if type(cell_val) == NumericContent:
+                        if type(cell_val) == NumericContent or type(cell_val) == float:
                             new_args.append(self.factory.create_numeric(str(cell_val)))
                         else:
                             raise InvalidCellReferenceError(f"The cell contains an str:{cell_val}")

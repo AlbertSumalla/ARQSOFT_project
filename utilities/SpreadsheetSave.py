@@ -19,17 +19,18 @@ class SpreadsheetSave:
         """
         try:
             # Determine write mode: append if file exists and is not a directory, else write
-            mode = 'a' if os.path.exists(file_path) and not os.path.isdir(file_path) else 'w'
-            with open(file_path, mode, encoding='utf-8') as f:
+            file_path = os.path.abspath(file_path)
+            with open(file_path, 'w', encoding='utf-8') as f:
                 for row in serial_rows:
                     # Write each cell followed by a semicolon
-                    for cell in row:
+                    for i,cell in enumerate(row):
                         cell_str = str(SpreadsheetSave.smart_value(cell))
                         # si es fórmula, cambiamos ; internos por ,
                         if cell_str.startswith('='):
                             cell_str = cell_str.replace(';', ',')
                         f.write(cell_str)
-                        f.write(';')
+                        if i < len(row)-1:
+                            f.write(';')
                     # End of row
                     f.write('\n')
         except Exception as e:

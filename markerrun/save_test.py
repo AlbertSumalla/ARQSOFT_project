@@ -135,6 +135,7 @@ class SaveTest(SuperClassForTests):
             return
         self.checkRow(count,expected,cell_coords,cells,weight*valor_total)
 
+
     def checkEmptyLine(self,num_row,cells,valor):
         to_throw = None
         error = None

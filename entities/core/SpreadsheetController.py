@@ -61,7 +61,7 @@ class SpreadsheetController(Spreadsheet):
         if ctype == "FORMULA":
             result = content_obj.get_content() #float del result of evaluation
             cell = self.factory.create_cell(coord_obj, result)
-            cell.formula = formula
+            cell.formula = str_content
         else: # Si no es formula, guardem el contingut a la cell directament
             cell = self.factory.create_cell(coord_obj, content_obj.get_content())
 
@@ -210,7 +210,7 @@ class SpreadsheetController(Spreadsheet):
                     else:
                         formula = cell.get_cell_formula()
                         if formula is not None:
-                            row_list.append(f"={formula}")
+                            row_list.append(formula)
                         else:
                             val = cell.get_cell_content()
                             row_list.append(str(val) if val is not None else "")
