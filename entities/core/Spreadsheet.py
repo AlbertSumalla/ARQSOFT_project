@@ -1,7 +1,8 @@
 from ..core.Cell import Cell
 from entities.core.Coordinate import Coordinate
 from entities.core.CellRange import CellRange
-from entities.exceptions.Exceptions import InvalidCellReferenceError
+from entities.exceptions.Exceptions import BadCoordinateException
+from entities.functions.NumericValue import NumericValue
 
 
 class Spreadsheet:
@@ -21,22 +22,30 @@ class Spreadsheet:
                 self.cells[new_coord] = blank_cell
 
     def get_cell(self, coord: Coordinate) -> Cell:
-        return self.cells.get(coord)
+        try:
+            return self.cells.get(coord)
+        except Exception:
+            return None
 
-    def get_cells_in_range(self, cell_range: CellRange) -> list[Cell]:
-        start = cell_range.get_start()
-        end   = cell_range.get_end()
-        range_cell_list: list[Cell] = []
+    def get_cells_in_range(self, cell_range: CellRange) -> list[Cell | NumericValue]:
+        start: Coordinate = cell_range.get_start()
+        end: Coordinate = cell_range.get_end()
 
-        for r in range(start.row, end.row + 1):
-            for c in range(start.col, end.col + 1):
-                letter = Coordinate.index_to_letter(c)
-                coord  = Coordinate.from_string(f"{letter}{r}")
-                # get_cell will raise if missing
+        start_col_idx = Coordinate.column_to_number(start.column_id)
+        end_col_idx   = Coordinate.column_to_number(end.column_id)
+
+        range_cell_list: list[Cell | NumericValue] = []
+        # Recorrer cada fila y cada columna numérica
+        for row in range(start.row_id, end.row_id + 1):
+            for col_idx in range(start_col_idx, end_col_idx + 1):
+                # Convertir índice de columna de vuelta a letras
+                col_letters = Coordinate.number_to_column(col_idx)
+                coord = Coordinate(col_letters, row)
                 cell = self.get_cell(coord)
                 range_cell_list.append(cell)
 
         return range_cell_list
+
 
     ##
     # @brief Updates all cells that depend on a modified cell.

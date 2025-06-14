@@ -10,7 +10,7 @@ class Tokenizer:
     r'[A-Za-z]+[0-9]+|'  # referencias simples, e.g. A1, AB12
     r'[A-Za-z_]\w*(?=\()|'  # nombres de función antes de '('
     r'[A-Za-z_]\w*|'  # palabras genéricas
-    r'[+\-*/^(),:]'  # operadores y puntuación (, :)
+    r'[+\-*/^():]'  # operadores y puntuación (, :)
     )
 
     @staticmethod
