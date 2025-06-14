@@ -139,7 +139,10 @@ class SpreadsheetController(Spreadsheet):
             cell = self.spreadsheet.get_cell(coord_obj) 
         except Exception:
             raise BadCoordinateException(f"Empty Cell: {coord}")
-        cell_content = cell.get_cell_content()
+        if  cell is None:
+            return ""
+        else:
+            cell_content = cell.get_cell_content()
 
         return str(cell_content)
 
@@ -163,8 +166,11 @@ class SpreadsheetController(Spreadsheet):
         
         formula = cell.get_cell_formula()
         if  formula is not None:
-            return formula #retornem el resultat de la formula
-
+            s = str(formula).strip()
+            if s.startswith('='):
+                return formula #retornem el resultat de la formula
+            else:
+                return "=" + formula
     ##@brief Tries to save the spreadsheet into a file.
     #
     # @param s_name_in_user_dir  the local name of the file with respect to the folder where the invoking method is placed

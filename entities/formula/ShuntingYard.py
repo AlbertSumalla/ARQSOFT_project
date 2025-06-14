@@ -47,7 +47,6 @@ class ShuntingYard:
                 coord_start = Coordinate.from_string(str_coord_start)
                 coord_end = Coordinate.from_string(str_coord_end)
                 cell_range = self.factory.create_cell_range(coord_start,coord_end)
-
                 contained_cells = spreadsheet.get_cells_in_range(cell_range)
                 for cell in contained_cells:
                     if cell is None:
@@ -58,7 +57,7 @@ class ShuntingYard:
                             new_args.append(self.factory.create_numeric(str(cell_val)))
                         else:
                             raise InvalidCellReferenceError(f"The cell contains an str:{cell_val}")
-                
+
                 for ele in new_args:
                     op_stack.append(ele)
 

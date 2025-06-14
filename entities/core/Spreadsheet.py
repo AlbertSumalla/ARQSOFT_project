@@ -1,4 +1,4 @@
-from ..core.Cell import Cell
+from entities.core.Cell import Cell
 from entities.core.Coordinate import Coordinate
 from entities.core.CellRange import CellRange
 from entities.exceptions.Exceptions import BadCoordinateException
