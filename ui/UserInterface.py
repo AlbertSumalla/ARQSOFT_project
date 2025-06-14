@@ -34,7 +34,7 @@ class UserInterface:
 
             match command:
                 case 'C':
-                    self.spreadsheet = self.controller.create_spreadsheet(10,10)
+                    self.spreadsheet = self.controller.create_spreadsheet()
 
                 case 'E':
                     if len(parts) < 3:
@@ -60,7 +60,7 @@ class UserInterface:
                         continue
                     path = parts[1]
                     try:
-                        self.controller.save_spreadsheet(path)
+                        self.controller.save_spreadsheet_to_file(path)
                     except Exception:
                         print("Invalid path or file name")
 
