@@ -1,4 +1,4 @@
-from ..content.Content import Content
+from entities.content.Content import Content
 
 class NumericContent(Content):
     def __init__(self, number: float):

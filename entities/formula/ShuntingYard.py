@@ -1,10 +1,12 @@
+from dbm import error
 from typing import List, Union
+from content.NumericContent import NumericContent
 from entities.formula.Operand import Operand
 from entities.formula.Operator import Operator
 from entities.functions.Function import Function
 from entities.core.Spreadsheet import Spreadsheet
 from entities.Factory.FormulaFactory import FormulaFactory
-from entities.exceptions.Exceptions import FormulaSyntaxError
+from entities.exceptions.Exceptions import FormulaSyntaxError , InvalidCellReferenceError
 from entities.core.Coordinate import Coordinate
 
 Component = Union[Operand, Operator]
@@ -50,9 +52,12 @@ class ShuntingYard:
                 for cell in contained_cells:
                     if cell is None:
                         cell_val = self.factory.create_numeric(str(0))
-                    else:    
-                        cell_val = float(cell.content)
-                    new_args.append(self.factory.create_numeric(str(cell_val)))
+                    else:
+                        cell_val = cell.content
+                        if type(cell_val) == NumericContent:
+                            new_args.append(self.factory.create_numeric(str(cell_val)))
+                        else:
+                            raise InvalidCellReferenceError(f"The cell contains an str:{cell_val}")
                 
                 for ele in new_args:
                     op_stack.append(ele)
