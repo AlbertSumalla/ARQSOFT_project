@@ -49,12 +49,10 @@ class SpreadsheetRenderer:
             serialized.append(row_list)
 
         for row in serialized:
-            # Write each cell followed by a semicolon
+            parts = []
             for cell in row:
                 cell_str = str(SpreadsheetSave.smart_value(cell))
-                # si es fórmula, cambiamos ; internos por ,
                 if cell_str.startswith('='):
                     cell_str = cell_str.replace(';', ',')
-                print(cell_str + ";")
-            # End of row
-            print('\n')
+                parts.append(cell_str)
+            print(";".join(parts) + ";")
