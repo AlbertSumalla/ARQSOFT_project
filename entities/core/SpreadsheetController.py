@@ -22,7 +22,6 @@ class SpreadsheetController(Spreadsheet):
         self.spreadsheet = self.factory.create_spreadsheet()
         return self.spreadsheet
 
-
     ##@brief Tries to set the content of a cell of the spreadsheet in a certain coordinate. See complete specification below following the link.
     #
     # @param coord   a string representing a coordinate in spreadsheet ('A10', for instance).
@@ -39,12 +38,10 @@ class SpreadsheetController(Spreadsheet):
     # formula that introduces in the spreadsheet some circular dependency
     
     def set_cell_content(self, coord, str_content):
-        # tornada a revisar, no testeada
-        try: #parse coord
-            coord_obj = Coordinate.from_string(coord)
-            cell = self.spreadsheet.get_cell(coord_obj)
+        try: # parse
+            coord_obj = Coordinate.from_string(coord)  
         except Exception:
-            raise BadCoordinateException(f"No cell on this coordinate: {coord}")
+            raise BadCoordinateException(f"Bad Coordinate format: {coord}")
 
         #content type
         ctype = self.identify_input_type(str_content)
@@ -101,12 +98,11 @@ class SpreadsheetController(Spreadsheet):
     # representation of a number
 
     def get_cell_content_as_float(self, coord):
-        # feta desde 0, crec q esta  bé, no testeada
         try:
             coord_obj = Coordinate.from_string(coord)
             cell = self.spreadsheet.get_cell(coord_obj)  
         except Exception:
-            raise BadCoordinateException(f"No cell on this coordinate: {coord}")
+            raise BadCoordinateException(f"Empty Cell: {coord}")
         if cell is None:
             return 0
         formula = cell.get_cell_formula()
@@ -138,12 +134,11 @@ class SpreadsheetController(Spreadsheet):
     # @exception BadCoordinateException if the cellCoord argument does not represent a proper spreadsheet coordinate
 
     def get_cell_content_as_string(self, coord):
-        # re-feta, esta  bé, no testeada
         try:
             coord_obj = Coordinate.from_string(coord)
             cell = self.spreadsheet.get_cell(coord_obj) 
         except Exception:
-            raise BadCoordinateException(f"No cell on this coordinate: {coord}")
+            raise BadCoordinateException(f"Empty Cell: {coord}")
         cell_content = cell.get_cell_content()
 
         return str(cell_content)

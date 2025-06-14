@@ -27,6 +27,14 @@ class Coordinate:
         for char in col:
             total = total * 26 + (ord(char) - ord('A') + 1)
         return total
+    
+    @staticmethod
+    def number_to_column(n: int) -> str:
+        result = ""
+        while n > 0:
+            n, rem = divmod(n - 1, 26)
+            result = chr(ord('A') + rem) + result
+        return result
 
     @staticmethod
     def index_to_letter(i: int) -> str:

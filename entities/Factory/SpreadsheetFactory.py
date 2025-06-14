@@ -4,6 +4,7 @@ from entities.content.NumericContent import NumericContent
 from entities.content.TextContent import TextContent
 from entities.content.Formula import Formula
 from entities.exceptions.Exceptions import InvalidFunctionError
+from entities.core.Coordinate import Coordinate
 
 class SpreadsheetFactory:
     def __init__(self):
@@ -11,6 +12,9 @@ class SpreadsheetFactory:
 
     def create_spreadsheet(self) -> Spreadsheet:
         return Spreadsheet()
+    
+    def create_coordinate(self,col: str,row: str) -> Coordinate:
+        return 
 
     def create_cell(self, coordinate, content) -> Cell:
         return Cell(coordinate, content)
