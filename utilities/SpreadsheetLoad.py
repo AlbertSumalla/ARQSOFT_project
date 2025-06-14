@@ -2,6 +2,7 @@
 import os
 from Factory.SpreadsheetFactory import SpreadsheetFactory
 from entities.exceptions.Exceptions import PathError, S2VFormatError
+from entities.core.Coordinate import Coordinate
 
 class SpreadsheetLoad:
     """
@@ -11,29 +12,29 @@ class SpreadsheetLoad:
         # controller debe exponer set_cell_content(coord: str, content: str)
         self.controller = controller
 
-    def load_spreadsheet(self, filepath: str) -> None:
-        """
-        Lee el archivo línea por línea, separa por ';', e invoca
-        controller.set_cell_content para cada celda no vacía.
-        """
+    @staticmethod
+    def read_file_as_matrix(filepath: str) -> list:
+        matrix = []
+        with open(os.path.join(os.getcwd(), filepath), 'r') as file:
+            for line in file:
+                line = line.strip().replace(" ", "")
+                if not line:
+                    break
+                matrix.append(line.split(";"))
+        return matrix
 
-        file = open(os.path.join(os.getcwd(),filepath), 'r')
-        num_rows = 0
-        while True:
-            num_rows += 1
-            line = file.readline().strip()
-            line = line.replace(" ", "")
-            row = line.split(";") #Aqui tengo un vector de (contenido) de celdas
-            for i in row:
-                letter = chr(ord('A') + num_rows)
-                coord = f"{letter}{i}"
-                self.controller.set_cell_content(coord, row[i])
-            # if line is empty
-            # end of file is reached
-            if not line:
-                break
-        file.close()
-
+    @staticmethod
+    def load_spreadsheet(controller, filepath: str) -> None:
+        with open(os.path.join(os.getcwd(), filepath), 'r') as file:
+            for row_index, line in enumerate(file):
+                line = line.strip().replace(" ", "")
+                if not line:
+                    break
+                row = line.split(";")
+                for col_index, content in enumerate(row):
+                    if content != "":
+                        coord = Coordinate.index_to_letter(col_index) + str(row_index + 1)
+                        controller.set_cell_content(coord, content)
 
     @staticmethod
     def int_to_string(col: int) -> str:
