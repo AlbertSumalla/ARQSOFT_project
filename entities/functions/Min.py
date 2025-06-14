@@ -11,5 +11,5 @@ class MIN(Function):
     def compute_formula(arguments: List[NumericValue]) -> NumericValue:
 
         result = np.min([arg.getValue() for arg in arguments])
-        result_num = FormulaFactory.create_numeric(str(result))
+        result_num = FormulaFactory.create_numeric(FormulaFactory(),str(result))
         return result_num
