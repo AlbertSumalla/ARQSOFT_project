@@ -7,6 +7,13 @@ class Coordinate:
         self.column_id = column_id
         self.row_id = row_id
 
+    def column_to_number(self) -> int:
+        total = 0
+        for char in self.column_id:
+            total = total * 26 + (ord(char) - ord('A') + 1)
+        return total
+
+
     def __eq__(self, other):
         return (
             isinstance(other, Coordinate)
