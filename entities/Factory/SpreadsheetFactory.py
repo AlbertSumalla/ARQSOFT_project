@@ -14,7 +14,11 @@ class SpreadsheetFactory:
         return Spreadsheet()
     
     def create_coordinate(self,col: str,row: str) -> Coordinate:
+<<<<<<< Updated upstream
         return Coordinate(col,row)
+=======
+        return 
+>>>>>>> Stashed changes
 
     def create_cell(self, coordinate, content) -> Cell:
         return Cell(coordinate, content)
