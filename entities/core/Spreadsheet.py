@@ -46,19 +46,3 @@ class Spreadsheet:
                 range_cell_list.append(cell)
 
         return range_cell_list
-
-
-    ##
-    # @brief Updates all cells and dependencies after importing a file.
-    # @param Spreadsheet: The spreadsheet instance to which cells have to be updated.
-    # @return None.
-    def update_cell_values(spreadsheet):
-        pass
-
-    ##
-    # @brief Scans the spreadsheet to detect any circular dependencies among cells.
-    # @param Spreadsheet: The spreadsheet instance.
-    # @exception CircularDependencyError Raised if circular dependencies are found.
-    # @return None
-    def identify_circular_dependencies(spreadsheet):
-        pass

@@ -83,9 +83,9 @@ class ContentException(SpreadsheetError):
     """
     pass
 
-class CircularDependencyException(SpreadsheetError):
+class CircularDependencyException(BaseException):
     """
-    Raised when a formula introduces a circular dependency among cells.
+    Raised when a circular dependency among spreadsheet cells is detected.
     """
     pass
 
