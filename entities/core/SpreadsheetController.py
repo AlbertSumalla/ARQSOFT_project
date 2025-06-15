@@ -39,7 +39,6 @@ class SpreadsheetController(Spreadsheet):
     #
     # @exception CircularDependencyException if the code detects that the strContent is
     # formula that introduces in the spreadsheet some circular dependency
-    
     def set_cell_content(self, coord, str_content):
         try: # parse
             coord_obj = Coordinate.from_string(coord)  
@@ -63,17 +62,14 @@ class SpreadsheetController(Spreadsheet):
         
         # Evaluate if is a formula and save cell. if not, just save the content
         if ctype == "FORMULA":
-            try:
-                self.update_dependent_cells(coord_obj)
-                result = content_obj.get_content()  # float del result of evaluation
-                cell = self.factory.create_cell(coord_obj, result)
-                cell.formula = str_content
-                self.set_dependencies(cell)
-            except Exception:
-                raise CircularDependencyException(f"Circular dependency detected: {cell.coordinate}")
+            self.update_dependent_cells(coord_obj)
+            result = content_obj.get_content()  # float del result of evaluation
+            cell = self.factory.create_cell(coord_obj, result)
+            cell.formula = str_content
+            self.set_dependencies(cell)
+
         else: # Si no es formula, guardem el contingut a la cell directament
             cell = self.factory.create_cell(coord_obj, content_obj.get_content())
-
 
         self.spreadsheet.set_cell(coord_obj, cell) #Set content value
 
@@ -81,31 +77,34 @@ class SpreadsheetController(Spreadsheet):
         # self.spreadsheet.recalculate_from(coord_obj)
 
     def set_dependencies(self, cell: Cell):
-        token_lsit = Tokenizer.tokenize(cell.formula[1:])
-        dependencies_list : List[Coordinate] = []
-        for token in token_lsit:
+        tokens = Tokenizer.tokenize(cell.formula[1:])
+        dependencies: List[Coordinate] = []
+        for token in tokens:
+            # single-cell tokens
             try:
-                dependencies_list.append(Coordinate.from_string(token))
+                dependencies.append(Coordinate.from_string(token))
             except Exception:
-                continue
+                pass
+            # range tokens
             if ':' in token:
-                str_coord_start, str_coord_end = token.split(':', 1)
-                coord_start = Coordinate.from_string(str_coord_start)
-                coord_end = Coordinate.from_string(str_coord_end)
-                cell_range = self.factory_formula.create_cell_range(coord_start, coord_end)
-                #sacamos todas las cells
-                start: Coordinate = cell_range.get_start()
-                end: Coordinate = cell_range.get_end()
-                start_col_idx = Coordinate.column_to_number(start.column_id)
-                end_col_idx = Coordinate.column_to_number(end.column_id)
-                for row in range(start.row_id, end.row_id + 1):
-                    for col_idx in range(start_col_idx, end_col_idx + 1):
-                        # Convertir índice de columna de vuelta a letras
-                        col_letters = Coordinate.number_to_column(col_idx)
-                        coord = Coordinate(col_letters, row)
-                        dependencies_list.append(coord)
+                start_str, end_str = token.split(':', 1)
+                try:
+                    start = Coordinate.from_string(start_str)
+                    end = Coordinate.from_string(end_str)
+                except Exception:
+                    continue
+                cell_range = self.factory_formula.create_cell_range(start, end)
+                sc = cell_range.get_start()
+                ec = cell_range.get_end()
+                sc_idx = Coordinate.column_to_number(sc.column_id)
+                ec_idx = Coordinate.column_to_number(ec.column_id)
+                for r in range(sc.row_id, ec.row_id + 1):
+                    for c_idx in range(sc_idx, ec_idx + 1):
+                        col_letters = Coordinate.number_to_column(c_idx)
+                        dependencies.append(Coordinate(col_letters, r))
+        # detect circular dependencies before setting
         self.identify_circular_dependencies(cell)
-        cell.set_cell_dependencies(dependencies_list)
+        cell.set_cell_dependencies(dependencies)
 
     @staticmethod
     def identify_input_type(input_string: str) -> str:
@@ -126,7 +125,6 @@ class SpreadsheetController(Spreadsheet):
     # @exception InvalidCellReferenceError Raised if a dependency is invalid.
     # @return None.
     def update_dependent_cells(self, coord: Coordinate):
-
         for key in self.spreadsheet.cells:
             cell = self.spreadsheet.cells[key]
             if coord in cell.dependencies:
@@ -140,10 +138,35 @@ class SpreadsheetController(Spreadsheet):
     # @exception CircularDependencyError Raised if circular dependencies are found.
     # @return None
     def identify_circular_dependencies(self, cell: Cell):
+        """
+        Raise CircularDependencyException if setting 'cell' with given 'dependencies'
+        would introduce a cycle in the dependency graph.
+        """
+        def has_path(src: Coordinate, dst: Coordinate, visited: set) -> bool:
+            if src == dst:
+                return True
+            visited.add(src)
+            existing = self.spreadsheet.cells.get(src)
+            if not existing:
+                return False
+            for dep in existing.dependencies:
+                if dep not in visited:
+                    if has_path(dep, dst, visited):
+                        return True
+            return False
 
-        for key in self.spreadsheet.cells:
-            if cell.coordinate in self.spreadsheet.cells[key].dependencies:
-                raise CircularDependencyException(f"Circular dependency detected: {cell.coordinate}")
+
+        for dep in cell.dependencies:
+            # direct self-reference
+            if dep == cell.coordinate:
+                raise CircularDependencyException(
+                    f"Circular dependency detected: {cell.coordinate} refers to itself"
+                )
+            # if dep can reach cell, a cycle would form
+            if has_path(dep, cell.coordinate, set()):
+                raise CircularDependencyException(
+                    f"Circular dependency detected between {cell.coordinate} and {dep}"
+                )
 
     ##@brief Returns the value of the content of a cell as a float. See complete specification below following the link.
     #
@@ -158,7 +181,6 @@ class SpreadsheetController(Spreadsheet):
     #
     # @exception NoNumberException if the cell contains textual content whose value is a string that is not the textual
     # representation of a number
-
     def get_cell_content_as_float(self, coord):
         try:
             coord_obj = Coordinate.from_string(coord)
@@ -194,7 +216,6 @@ class SpreadsheetController(Spreadsheet):
     # string representing the number resulting of evaluating such formula
     #
     # @exception BadCoordinateException if the cellCoord argument does not represent a proper spreadsheet coordinate
-
     def get_cell_content_as_string(self, coord):
         try:
             coord_obj = Coordinate.from_string(coord)
@@ -217,7 +238,6 @@ class SpreadsheetController(Spreadsheet):
     #
     # @exception BadCoordinateException if the coord argument does not represent a legal coordinate in the spreadsheet
     # OR if the coord argument represents a legal coordinate BUT cell in this coordinate DOES NOT CONTAIN A FORMULA
-
     def get_cell_formula_expression(self, coord):
         # feta desde 0, crec q esta  bé, no testeada
         coord_obj = Coordinate.from_string(coord)
