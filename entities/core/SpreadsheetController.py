@@ -11,7 +11,7 @@ from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
 from entities.exceptions.Exceptions import *
 from utilities.SpreadsheetSave import SpreadsheetSave
 from usecasesmarker.saving_spreadsheet_exception import SavingSpreadsheetException
-from utilities.SpreadsheetLoad import SpreadsheetLoad
+
 
 class SpreadsheetController(Spreadsheet):
     def __init__(self):
@@ -237,6 +237,7 @@ class SpreadsheetController(Spreadsheet):
 
 
     def load_spreadsheet_from_file(self, s_name_in_user_dir):
+        from utilities.SpreadsheetLoad import SpreadsheetLoad
         # 1. Leer el archivo para saber el tamaño
         matrix = SpreadsheetLoad.read_file_as_matrix(s_name_in_user_dir)
 

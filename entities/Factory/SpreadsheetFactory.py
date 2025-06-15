@@ -6,6 +6,7 @@ from entities.content.Formula import Formula
 from entities.exceptions.Exceptions import InvalidFunctionError
 from entities.core.Coordinate import Coordinate
 
+
 class SpreadsheetFactory:
     def __init__(self):
         pass

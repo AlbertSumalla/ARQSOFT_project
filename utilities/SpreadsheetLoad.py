@@ -1,11 +1,12 @@
 # utilities/SpreadsheetLoad.py
 import os
 import re
-from Factory.SpreadsheetFactory import SpreadsheetFactory
+
 from entities.exceptions.Exceptions import PathError, S2VFormatError
 from entities.core.Coordinate import Coordinate
 from entities.exceptions.Exceptions import DivisionByZeroError
-
+from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
+from entities.core.SpreadsheetController import SpreadsheetController
 
 class SpreadsheetLoad:
     """

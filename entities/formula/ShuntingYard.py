@@ -1,6 +1,6 @@
 from dbm import error
 from typing import List, Union
-from content.NumericContent import NumericContent
+from entities.content.NumericContent import NumericContent
 from entities.formula.Operand import Operand
 from entities.formula.Operator import Operator
 from entities.functions.Function import Function
