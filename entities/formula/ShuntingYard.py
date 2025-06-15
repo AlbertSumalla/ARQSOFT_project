@@ -16,11 +16,14 @@ class ShuntingYard:
         self.factory = FormulaFactory()
         from entities.core.SpreadsheetController import SpreadsheetController
         self.ctrl = SpreadsheetController()
+        self.par_levl = 0
+        self.in_funct = False
 
     def generate_postfix_expression(self, tokens: List[str], spreadsheet: Spreadsheet) -> List[Component]:
         output_postfix: List[Component] = []
         op_stack: List[Union[str, Operator]] = []
         new_args: List[Operand] = []
+        aux_list: List[Operand] = []
         self.ctrl.spreadsheet = spreadsheet
         
         for token in tokens:
@@ -34,6 +37,7 @@ class ShuntingYard:
             # 2) Nombres de función
             elif self.factory.is_function_name(token):
                 op_stack.append(token)
+                self.in_funct = True
 
             # 3) Separadores de argumentos
             elif token == ';':
@@ -60,16 +64,23 @@ class ShuntingYard:
 
                 for ele in new_args:
                     op_stack.append(ele)
+                new_args.clear()
 
             # 5) Paréntesis izquierdo
             elif token == '(':
                 op_stack.append(token)
+                if self.in_funct == True:
+                    self.par_levl += 1
+
 
             # 6) Paréntesis derecho: fin de expresión o de llamada a función
             elif token == ')':
                 # Desapilar hasta el último '('
-                while op_stack and op_stack[-1] != '(':  
-                    output_postfix.append(op_stack.pop())
+                while op_stack and op_stack[-1] != '(':
+                    if self.par_levl > 1:
+                        aux_list.append(op_stack.pop())
+                    else:
+                        output_postfix.append(op_stack.pop())
                 op_stack.pop()  # eliminar '('
 
                 # Si lo previo es nombre de función, recoger argumentos y expandir rangos
@@ -77,14 +88,28 @@ class ShuntingYard:
                     func_name = op_stack.pop()
                     # Reconstruir lista de args (tokens y Operands)
                     args: List[Union[str, Operand]] = []
-                    while output_postfix and isinstance(output_postfix[-1], (Operand)):
-                        args.append(output_postfix.pop())
+                    if self.par_levl > 1:
+                        while aux_list and isinstance(aux_list[-1], (Operand)):
+                            args.append(aux_list.pop())
+                    else:
+                        while output_postfix and isinstance(output_postfix[-1], (Operand)):
+                            args.append(output_postfix.pop())
                     # También puede haber ':' en op_stack, así que incorporar
                     # Buscamos backwards en stack temporal si fuera necesario
                     args.reverse()
                     function: Function = self.factory.create_function(func_name)
                     result: Operand = function.compute_formula(args)
-                    output_postfix.append(result)
+                    args.clear()
+                    if self.in_funct == True:
+                        if self.par_levl == 1:
+                            output_postfix.append(result)
+                            self.in_funct = False
+                        else:
+                            op_stack.append(result)
+                            self.par_levl -= 1
+                    else:
+                        output_postfix.append(result)
+
 
             # 7) Operadores binarios
             elif self.factory.is_operator(token):
