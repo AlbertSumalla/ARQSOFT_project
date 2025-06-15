@@ -72,7 +72,7 @@ class SpreadsheetController(Spreadsheet):
 
 
         self.spreadsheet.set_cell(coord_obj, cell) #Set content value
-
+        self.update_dependent_cells(coord_obj)
         # propagate dependencies, no implementat encara
         # self.spreadsheet.recalculate_from(coord_obj)
 
@@ -113,7 +113,22 @@ class SpreadsheetController(Spreadsheet):
         except ValueError:
             pass
         return 'TEXT'
-    
+
+    ##
+    # @brief Updates all cells that depend on a modified cell.
+    # @param coord: The coordinate of the cell whose value was updated.
+    # @exception CircularDependencyError Raised if a circular dependency is found.
+    # @exception InvalidCellReferenceError Raised if a dependency is invalid.
+    # @return None.
+    def update_dependent_cells(self, coord: Coordinate):
+
+        for key in self.spreadsheet.cells:
+            cell = self.spreadsheet.cells[key]
+            if coord in cell.dependencies:
+                formula = cell.formula [1:]
+                content_obj = self.factory.create_formula(formula, self.spreadsheet)
+                self.spreadsheet.cells[key].content = content_obj.get_content()
+
     ##@brief Returns the value of the content of a cell as a float. See complete specification below following the link.
     #
     # @param coord   a string representing a coordinate in spreadsheet ('A10', for instance).

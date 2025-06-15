@@ -49,15 +49,6 @@ class Spreadsheet:
 
 
     ##
-    # @brief Updates all cells that depend on a modified cell.
-    # @param cell: The cell whose value was updated.
-    # @exception CircularDependencyError Raised if a circular dependency is found.
-    # @exception InvalidCellReferenceError Raised if a dependency is invalid.
-    # @return None.
-    def update_dependent_cells(cell):
-        pass
-
-    ##
     # @brief Updates all cells and dependencies after importing a file.
     # @param Spreadsheet: The spreadsheet instance to which cells have to be updated.
     # @return None.

@@ -17,6 +17,9 @@ class Cell:
     def set_cell_dependencies(self, dependencies: List[Coordinate]):
         self.dependencies = dependencies
 
+    def get_cell_dependencies(self):
+        return self.dependencies
+
     def get_cell_formula(self):
         return self.formula
 
