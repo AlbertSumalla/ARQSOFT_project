@@ -1,19 +1,22 @@
 from ..core.Coordinate import Coordinate
 from ..content.Content import Content
-
+from typing import List
 class Cell:
     def __init__(self, coordinate: Coordinate, content: Content):
         self.coordinate = coordinate
         self.content = content
         self.formula = None
-        self.dependencies = set()
+        self.dependencies : List[Coordinate] = []
 
     def get_cell_content(self):
         return self.content
     
-    def set_cell_content(self, content: Content):
+    def set_content(self, content: Content):
         self.content = content
-        
+
+    def set_cell_dependencies(self, dependencies: List[Coordinate]):
+        self.dependencies = dependencies
+
     def get_cell_formula(self):
         return self.formula
 

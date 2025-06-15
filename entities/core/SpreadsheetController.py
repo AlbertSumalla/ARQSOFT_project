@@ -1,5 +1,6 @@
 # entities/core/SpreadsheetController.py
 import os
+from typing import List
 from collections import defaultdict
 from entities.core.Spreadsheet import Spreadsheet
 from entities.core.Coordinate import Coordinate
@@ -8,14 +9,16 @@ from entities.content.NumericContent import NumericContent
 from entities.content.TextContent import TextContent
 from entities.content.Formula import Formula
 from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
+from entities.Factory.FormulaFactory import FormulaFactory
 from entities.exceptions.Exceptions import *
 from utilities.SpreadsheetSave import SpreadsheetSave
 from usecasesmarker.saving_spreadsheet_exception import SavingSpreadsheetException
-
+from entities.formula.Tokenizer import Tokenizer
 
 class SpreadsheetController(Spreadsheet):
     def __init__(self):
         self.factory = SpreadsheetFactory()
+        self.factory_formula = FormulaFactory()
         self.spreadsheet = None
 
     def create_spreadsheet(self) -> Spreadsheet:
@@ -48,6 +51,7 @@ class SpreadsheetController(Spreadsheet):
         if ctype == "FORMULA":
             formula = str_content[1:]
             content_obj = self.factory.create_formula(formula, self.spreadsheet)
+            #dependency , tokenizer,
         elif ctype == "NUM":
             try:
                 num = float(str_content)
@@ -62,14 +66,41 @@ class SpreadsheetController(Spreadsheet):
             result = content_obj.get_content() #float del result of evaluation
             cell = self.factory.create_cell(coord_obj, result)
             cell.formula = str_content
+            self.set_dependencies(cell)
         else: # Si no es formula, guardem el contingut a la cell directament
             cell = self.factory.create_cell(coord_obj, content_obj.get_content())
+
 
         self.spreadsheet.set_cell(coord_obj, cell) #Set content value
 
         # propagate dependencies, no implementat encara
         # self.spreadsheet.recalculate_from(coord_obj)
 
+    def set_dependencies(self, cell: Cell):
+        token_lsit = Tokenizer.tokenize(cell.formula[1:])
+        dependencies_list : List[Coordinate] = []
+        for token in token_lsit:
+            try:
+                dependencies_list.append(Coordinate.from_string(token))
+            except Exception:
+                continue
+            if ':' in token:
+                str_coord_start, str_coord_end = token.split(':', 1)
+                coord_start = Coordinate.from_string(str_coord_start)
+                coord_end = Coordinate.from_string(str_coord_end)
+                cell_range = self.factory_formula.create_cell_range(coord_start, coord_end)
+                #sacamos todas las cells
+                start: Coordinate = cell_range.get_start()
+                end: Coordinate = cell_range.get_end()
+                start_col_idx = Coordinate.column_to_number(start.column_id)
+                end_col_idx = Coordinate.column_to_number(end.column_id)
+                for row in range(start.row_id, end.row_id + 1):
+                    for col_idx in range(start_col_idx, end_col_idx + 1):
+                        # Convertir índice de columna de vuelta a letras
+                        col_letters = Coordinate.number_to_column(col_idx)
+                        coord = Coordinate(col_letters, row)
+                        dependencies_list.append(coord)
+        cell.set_cell_dependencies(dependencies_list)
 
     @staticmethod
     def identify_input_type(input_string: str) -> str:
@@ -171,6 +202,7 @@ class SpreadsheetController(Spreadsheet):
                 return formula #retornem el resultat de la formula
             else:
                 return "=" + formula
+
     ##@brief Tries to save the spreadsheet into a file.
     #
     # @param s_name_in_user_dir  the local name of the file with respect to the folder where the invoking method is placed
@@ -235,7 +267,6 @@ class SpreadsheetController(Spreadsheet):
     # @exception ReadingSpreadSheetException if something has gone wrong while trying to create spreadsheet and fill
     # it with the data present within the aforementioned file.
 
-
     def load_spreadsheet_from_file(self, s_name_in_user_dir):
         from utilities.SpreadsheetLoad import SpreadsheetLoad
         # 1. Leer el archivo para saber el tamaño
@@ -246,4 +277,3 @@ class SpreadsheetController(Spreadsheet):
 
         # 3. Rellenar contenidos usando self como controlador
         SpreadsheetLoad.load_spreadsheet(self, s_name_in_user_dir)
-
