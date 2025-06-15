@@ -63,16 +63,20 @@ class SpreadsheetController(Spreadsheet):
         
         # Evaluate if is a formula and save cell. if not, just save the content
         if ctype == "FORMULA":
-            result = content_obj.get_content() #float del result of evaluation
-            cell = self.factory.create_cell(coord_obj, result)
-            cell.formula = str_content
-            self.set_dependencies(cell)
+            try:
+                self.update_dependent_cells(coord_obj)
+                result = content_obj.get_content()  # float del result of evaluation
+                cell = self.factory.create_cell(coord_obj, result)
+                cell.formula = str_content
+                self.set_dependencies(cell)
+            except Exception:
+                raise CircularDependencyException(f"Circular dependency detected: {cell.coordinate}")
         else: # Si no es formula, guardem el contingut a la cell directament
             cell = self.factory.create_cell(coord_obj, content_obj.get_content())
 
 
         self.spreadsheet.set_cell(coord_obj, cell) #Set content value
-        self.update_dependent_cells(coord_obj)
+
         # propagate dependencies, no implementat encara
         # self.spreadsheet.recalculate_from(coord_obj)
 
@@ -100,6 +104,7 @@ class SpreadsheetController(Spreadsheet):
                         col_letters = Coordinate.number_to_column(col_idx)
                         coord = Coordinate(col_letters, row)
                         dependencies_list.append(coord)
+        self.identify_circular_dependencies(cell)
         cell.set_cell_dependencies(dependencies_list)
 
     @staticmethod
@@ -128,6 +133,17 @@ class SpreadsheetController(Spreadsheet):
                 formula = cell.formula [1:]
                 content_obj = self.factory.create_formula(formula, self.spreadsheet)
                 self.spreadsheet.cells[key].content = content_obj.get_content()
+
+    ##
+    # @brief Scans the spreadsheet to detect any circular dependencies among cells.
+    # @param Spreadsheet: The spreadsheet instance.
+    # @exception CircularDependencyError Raised if circular dependencies are found.
+    # @return None
+    def identify_circular_dependencies(self, cell: Cell):
+
+        for key in self.spreadsheet.cells:
+            if cell.coordinate in self.spreadsheet.cells[key].dependencies:
+                raise CircularDependencyException(f"Circular dependency detected: {cell.coordinate}")
 
     ##@brief Returns the value of the content of a cell as a float. See complete specification below following the link.
     #
