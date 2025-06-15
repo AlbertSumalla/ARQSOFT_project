@@ -1,5 +1,6 @@
 # utilities/SpreadsheetLoad.py
 import os
+import re
 from Factory.SpreadsheetFactory import SpreadsheetFactory
 from entities.exceptions.Exceptions import PathError, S2VFormatError
 from entities.core.Coordinate import Coordinate
@@ -42,7 +43,11 @@ class SpreadsheetLoad:
                     # 1) volvemos a punto y coma los args de las fórmulas
                     content_norm = content
                     if content_norm.startswith('='):
+                    # 1) convierte todos los commas a semicolon (argumentos de fórmula)
                         content_norm = content_norm.replace(',', ';')
+                    # 2) pero restaura la coma que va justo antes de cualquier llamada a función anidada
+                    # busca ';' seguido de un nombre de función (letras) y '('
+                        content_norm = re.sub(r';(?=[A-Za-z_][A-Za-z0-9_]*\()', ',', content_norm)
 
                     try:
                         # 2) intentamos la carga normal (que internamente evalúa)
