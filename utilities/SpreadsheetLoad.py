@@ -1,20 +1,57 @@
 # utilities/SpreadsheetLoad.py
 import os
 import re
-
 from entities.exceptions.Exceptions import PathError, S2VFormatError
 from entities.core.Coordinate import Coordinate
 from entities.exceptions.Exceptions import DivisionByZeroError
-from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
 from entities.core.SpreadsheetController import SpreadsheetController
 
 class SpreadsheetLoad:
-    """
-    Carga una hoja de cálculo desde un archivo S2V (semicolon-separated values).
-    """
     def __init__(self, controller):
         # controller debe exponer set_cell_content(coord: str, content: str)
-        self.controller = controller
+        from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
+        self.controller = None
+        self.factory = SpreadsheetFactory()
+
+
+
+    @staticmethod
+    def load_spreadsheet(controller: SpreadsheetController, serialized_rows):
+        compute_last = []
+        # Guardem totes les posicions de les rows a la llista
+        for num_row,row in enumerate(serialized_rows):
+            for num_col,str_content in enumerate(row):
+                serialized_rows[num_row][num_col] = str_content.replace(',', ';')
+                coord_letter = Coordinate.number_to_column(num_col+1)
+                coord_str = f"{coord_letter}{num_row+1}"
+                try:
+                    controller.set_cell_content(coord_str,str_content)
+                except Exception:
+                    compute_last.append(coord_str)
+        
+        # Les que no s'han pogut guardar (per dependencies circulars o similar, es computen ara recursivament. LIFO, si una torna a fallar, es posa la ultima a computar)
+        timeout = 0
+        while compute_last:
+            coord_str = compute_last[0]
+            compute_last.remove(coord_str)
+            col_letter = coord_str[0]
+            row_number = int(coord_str[1:])
+
+            num_col = Coordinate.column_to_number(col_letter) - 1
+            num_row = row_number - 1
+            str_content = serialized_rows[num_row][num_col]
+            try:
+                controller.set_cell_content(coord_str,str_content)
+
+                print(controller.spreadsheet.cells[Coordinate(col_letter,row_number)].formula)
+                timeout = 0
+            except Exception:
+                # LIFO
+                if timeout > 1: # evita bucle infinit en cas que un append falli
+                    compute_last.append(coord_str)
+                    timeout = 0
+                else:
+                    timeout += 1
 
     @staticmethod
     def read_file_as_matrix(filepath: str) -> list:
@@ -25,50 +62,6 @@ class SpreadsheetLoad:
                 if not line:
                     break
                 matrix.append(line.split(";"))
-        return matrix
+        return matrix     
 
-    @staticmethod
-    def load_spreadsheet(controller, filepath: str) -> None:
-        with open(os.path.join(os.getcwd(), filepath), 'r') as file:
-            for row_index, line in enumerate(file):
-                line = line.strip().replace(" ", "")
-                if not line:
-                    break
-                row = line.split(";")
-                for col_index, content in enumerate(row):
-                    if content == "":
-                        continue
 
-                    coord = Coordinate.index_to_letter(col_index) + str(row_index + 1)
-
-                    # 1) volvemos a punto y coma los args de las fórmulas
-                    content_norm = content
-                    if content_norm.startswith('='):
-                    # 1) convierte todos los commas a semicolon (argumentos de fórmula)
-                        content_norm = content_norm.replace(',', ';')
-                    # 2) pero restaura la coma que va justo antes de cualquier llamada a función anidada
-                    # busca ';' seguido de un nombre de función (letras) y '('
-                        content_norm = re.sub(r';(?=[A-Za-z_][A-Za-z0-9_]*\()', ',', content_norm)
-
-                    try:
-                        # 2) intentamos la carga normal (que internamente evalúa)
-                        controller.set_cell_content(coord, content_norm)
-
-                    except DivisionByZeroError:
-                        # 3) si da división por cero, guardo solo la fórmula (sin evaluar)
-                        coord_obj = Coordinate.from_string(coord)
-                        formula_str = content_norm[1:]  # sin el '=' inicial
-                        # celda con valor dummy (0) y fórmula
-                        cell = controller.factory.create_cell(coord_obj, 0.0)
-                        cell.formula = formula_str
-                        controller.spreadsheet.set_cell(coord_obj, cell)
-
-    @staticmethod
-    def int_to_string(col: int) -> str:
-        """
-        Convierte un índice de columna (1-based) a letra ('A', 'B', ...).
-        """
-        letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        if col < 1 or col > len(letters):
-            raise ValueError(f"Índice de columna fuera de rango: {col}")
-        return letters[col - 1]

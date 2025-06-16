@@ -4,7 +4,7 @@ from typing import List
 class Cell:
     def __init__(self, coordinate: Coordinate, content: Content):
         self.coordinate = coordinate
-        self.content = content
+        self.content = content if content is not None else None
         self.formula = None
         self.dependencies : List[Coordinate] = []
 

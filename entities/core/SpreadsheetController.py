@@ -62,12 +62,12 @@ class SpreadsheetController(Spreadsheet):
         
         # Evaluate if is a formula and save cell. if not, just save the content
         if ctype == "FORMULA":
-            self.update_dependent_cells(coord_obj)
             result = content_obj.get_content()  # float del result of evaluation
             cell = self.factory.create_cell(coord_obj, result)
+            str_content.replace(',', ';')
             cell.formula = str_content
-            self.set_dependencies(cell)
-
+            #self.set_dependencies(cell)
+            #self.update_dependent_cells(coord_obj)
         else: # Si no es formula, guardem el contingut a la cell directament
             cell = self.factory.create_cell(coord_obj, content_obj.get_content())
 
@@ -199,7 +199,7 @@ class SpreadsheetController(Spreadsheet):
                 try:
                     return float(str(cell_content)) # S'intenta extreure el valor numéric del text
                 except ValueError:
-                    if cell_content == "":
+                    if cell_content == "" or cell_content == None:
                         return 0
                     else:
                         raise NoNumberException(f"Cell '{cell_content}' has no number.")
@@ -245,8 +245,10 @@ class SpreadsheetController(Spreadsheet):
             cell = self.spreadsheet.get_cell(coord_obj)  
         except Exception:
             raise BadCoordinateException(f"No cell on this coordinate: {coord}")
-        
-        formula = cell.get_cell_formula()
+        try:
+            formula = cell.get_cell_formula()
+        except Exception:
+            formula = None
         if  formula is not None:
             s = str(formula).strip()
             if s.startswith('='):
@@ -320,11 +322,11 @@ class SpreadsheetController(Spreadsheet):
 
     def load_spreadsheet_from_file(self, s_name_in_user_dir):
         from utilities.SpreadsheetLoad import SpreadsheetLoad
-        # 1. Leer el archivo para saber el tamaño
         matrix = SpreadsheetLoad.read_file_as_matrix(s_name_in_user_dir)
 
-        # 2. Crear spreadsheet con tamaño adecuado
         self.create_spreadsheet()
 
-        # 3. Rellenar contenidos usando self como controlador
-        SpreadsheetLoad.load_spreadsheet(self, s_name_in_user_dir)
+        # Rellenar contenidos usando self como controlador
+        SpreadsheetLoad.load_spreadsheet(self, matrix)
+        
+        # badSpreadsheetLoad.load_spreadsheet(self, s_name_in_user_dir)
