@@ -51,6 +51,7 @@ class SpreadsheetController(Spreadsheet):
         if ctype == "FORMULA":
             formula = str_content[1:]
             content_obj = self.factory.create_formula(formula, self.spreadsheet)
+            #dependency , tokenizer,
         elif ctype == "NUM":
             try:
                 num = float(str_content)
@@ -66,8 +67,7 @@ class SpreadsheetController(Spreadsheet):
             cell = self.factory.create_cell(coord_obj, result)
             cell.formula = str_content
             self.set_dependencies(cell)
-            #self.circular_dependency_test(cell.coordinate,cell.dependencies)
-
+            #self.identify_circular_dependencies(cell)
         else: # Si no es formula, guardem el contingut a la cell directament
             cell = self.factory.create_cell(coord_obj, content_obj.get_content())
 
@@ -76,7 +76,6 @@ class SpreadsheetController(Spreadsheet):
         self.update_dependent_cells(cell)
 
     def set_dependencies(self, cell: Cell):
-        cell.dependencies.clear() # borrar para crear la nova list
         tokens = Tokenizer.tokenize(cell.formula[1:])
         dependencies: List[Coordinate] = []
         for token in tokens:
@@ -148,8 +147,8 @@ class SpreadsheetController(Spreadsheet):
             
             self.set_cell_content(str_coord,str_content)
 
-
     def update_dependent_cells(self, changed_cell: Cell) -> None:
+
         start_coord = changed_cell.coordinate
 
         # queue and visitor
@@ -159,6 +158,7 @@ class SpreadsheetController(Spreadsheet):
         while queue:
             curr = queue.popleft()
             for coord, cell in list(self.spreadsheet.cells.items()):
+                # coord es un Coordinate, cell.dependencies es List[Coordinate]
                 if curr in cell.dependencies and coord not in visited:
                     # 5) Reconstruir el contenido con '=' garantizado
                     formula = getattr(cell, 'formula', None)
@@ -174,25 +174,32 @@ class SpreadsheetController(Spreadsheet):
 
     ##
     # @brief Scans the spreadsheet to detect any circular dependencies among cells.
-    # @param Coordinate The coord changed
-    # @param dependencies the dependencies list
+    # @param Spreadsheet: The spreadsheet instance.
     # @exception CircularDependencyError Raised if circular dependencies are found.
     # @return None
-    def circular_dependency_test(self, start: Coordinate, dependencies: list[Coordinate]) -> None:
-        visited = set()
-        stack = list(dependencies)
-        while stack:
-            current = stack.pop()
-            if current == start:
-                raise CircularDependencyException(f"Circular dependency detected at {start}")
-            if current in visited:
-                continue
-            visited.add(current)
-            cell = self.spreadsheet.cells.get(current)
-            if not cell:
-                continue
-            for dep in getattr(cell, 'dependencies', []):
-                stack.append(dep)
+    def identify_circular_dependencies(self, cell: Cell):
+        def has_path(src: Coordinate, dst: Coordinate, visited: set) -> bool:
+            if src == dst:
+                return True
+            visited.add(src)
+            existing = self.spreadsheet.cells.get(src)
+            if not existing:
+                return False
+            for dep in existing.dependencies:
+                if dep not in visited:
+                    if has_path(dep, dst, visited):
+                        return True
+            return False
+        for dep in cell.dependencies:
+            if dep == cell.coordinate:
+                raise CircularDependencyException(
+                    f"Circular dependency detected: {cell.coordinate} refers to itself"
+                )
+            # if dep can reach cell, a cycle would form
+            if has_path(dep, cell.coordinate, set()):
+                raise CircularDependencyException(
+                    f"Circular dependency detected between {cell.coordinate} and {dep}"
+                )
 
     ##@brief Returns the value of the content of a cell as a float. See complete specification below following the link.
     #
