@@ -31,12 +31,12 @@ class PostfixEvaluate:
                 try:
                     result = comp.apply(left, right)
                 except ZeroDivisionError:
-                    raise DivisionByZeroError("Division por cero durante la evaluación")
+                    raise DivisionByZeroError("Division by zero durig evaluation")
                 stack.append(result)
 
             else:
                 # No debería suceder si ShuntingYard produce solo Operands y Operators
-                raise FormulaSyntaxError(f"Token desconocido en postfijo: {comp}")
+                raise FormulaSyntaxError(f"Unknown token: {comp}")
 
         if len(stack) != 1:
             raise FormulaSyntaxError("Expresión postfija inválida: pila final con múltiples valores")
