@@ -8,7 +8,6 @@ from entities.core.SpreadsheetController import SpreadsheetController
 
 class SpreadsheetLoad:
     def __init__(self, controller):
-        # controller debe exponer set_cell_content(coord: str, content: str)
         from entities.Factory.SpreadsheetFactory import SpreadsheetFactory
         self.controller = None
         self.factory = SpreadsheetFactory()

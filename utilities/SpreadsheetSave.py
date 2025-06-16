@@ -4,19 +4,9 @@ import os
 from entities.exceptions.Exceptions import PathError
 
 class SpreadsheetSave:
-    """
-    Responsible for saving spreadsheets in S2V (semicolon-separated values) format.
-    """
 
     @staticmethod
     def save_to_s2v(serial_rows, file_path: str) -> None:
-        """
-        Save the provided serialized rows to a file in S2V format.
-
-        :param serial_rows: iterable of rows, each a sequence of cell string values
-        :param file_path: path where the S2V file will be saved
-        :raises PathError: if the file cannot be written
-        """
         try:
             # Determine write mode: append if file exists and is not a directory, else write
             file_path = os.path.abspath(file_path)
@@ -34,12 +24,10 @@ class SpreadsheetSave:
                     # End of row
                     f.write('\n')
         except Exception as e:
-            # Wrap any IO error in PathError
             raise PathError(str(e))
 
     @staticmethod
     def smart_value(x):
-        # si ya es float, lo dejamos listo para chequear .is_integer()
         if isinstance(x, float):
             if x.is_integer():
                 return int(x)

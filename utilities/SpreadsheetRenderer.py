@@ -5,18 +5,9 @@ from utilities.SpreadsheetSave import SpreadsheetSave
 
 class SpreadsheetRenderer:
     def __init__(self):
-        # Instancia un controlador para evaluar celdas
         self.ctrl = SpreadsheetController()
 
     def display_spreadsheet(self, spreadsheet) -> str:
-        """
-        Generate and return a string representation of the spreadsheet's current values,
-        including column headers and row numbers in a formatted grid.
-
-        :param spreadsheet: an instance of the Spreadsheet model
-        :return: multi-line string representing the spreadsheet
-        """
-        # Enlaza el controlador con el modelo
         self.ctrl.spreadsheet = spreadsheet
 
 
@@ -26,8 +17,6 @@ class SpreadsheetRenderer:
             row_max_col[coord.row_id] = max(row_max_col[coord.row_id], col_idx + 1)
 
         serialized = []
-
-        # 2) Serializo Matriz
         for row in sorted(row_max_col):
             max_col = row_max_col[row] - 1
             row_list = []

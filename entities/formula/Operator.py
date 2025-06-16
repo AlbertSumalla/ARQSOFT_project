@@ -10,7 +10,7 @@ class Operator:
             '^': (4, 'right'),
         }
         if symbol not in table:
-            raise ValueError(f"Operador desconocido: {symbol}")
+            raise ValueError(f"Unknown Operand: {symbol}")
         self.precedence, self.associativity = table[symbol]
 
     def apply(self, left_value: float, right_value: float) -> float:
@@ -22,7 +22,7 @@ class Operator:
             return left_value * right_value
         elif self.symbol == '/':
             if right_value == 0:
-                raise ZeroDivisionError("División por cero en fórmula")
+                raise ZeroDivisionError("By-zero division")
             return left_value / right_value
         elif self.symbol == '^':
             return left_value ** right_value

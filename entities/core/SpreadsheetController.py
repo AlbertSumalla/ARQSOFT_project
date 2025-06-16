@@ -81,7 +81,6 @@ class SpreadsheetController(Spreadsheet):
         for token in tokens:
             # single-cell tokens
             try:
-                #if Coordinate.from_string(token) not in dependencies:
                 dependencies.append(Coordinate.from_string(token))
             except Exception:
                 pass
@@ -272,7 +271,6 @@ class SpreadsheetController(Spreadsheet):
     # @exception BadCoordinateException if the coord argument does not represent a legal coordinate in the spreadsheet
     # OR if the coord argument represents a legal coordinate BUT cell in this coordinate DOES NOT CONTAIN A FORMULA
     def get_cell_formula_expression(self, coord):
-        # feta desde 0, crec q esta  bé, no testeada
         coord_obj = Coordinate.from_string(coord)
         try:
             cell = self.spreadsheet.get_cell(coord_obj)  
@@ -298,18 +296,6 @@ class SpreadsheetController(Spreadsheet):
     # @exception SavingSpreadSheetException if something has gone wrong while trying to write the spreadsheet into the aforementioned file
 
     def save_spreadsheet_to_file(self, s_name_in_user_dir):
-        """
-        Tries to save the spreadsheet into a .s2v file using SpreadsheetSave.save_to_s2v.
-
-        :param s_name_in_user_dir: Local filename relative to current working dir.
-        :exception SavingSpreadsheetException: If an error occurs.
-
-        Formato .s2v:
-        - Cada fila es una línea.
-        - Celdas separadas por `;`.
-        - Cada valor se escribe tal cual: fórmulas con `=` delante, texto o número directo.
-        """
-        # 1) Calculamos cuántas columnas útiles hay en cada fila:
         row_max_col = defaultdict(int)
         for coord in self.spreadsheet.cells:
             col_idx = Coordinate.column_to_number(coord.column_id)
@@ -319,7 +305,6 @@ class SpreadsheetController(Spreadsheet):
             file_path = os.path.join(os.getcwd(), s_name_in_user_dir)
             serialized = []
 
-            # 2) Recorro cada fila en orden
             for row in sorted(row_max_col):
                 max_col = row_max_col[row]-1
                 row_list = []
@@ -339,7 +324,6 @@ class SpreadsheetController(Spreadsheet):
                             val = cell.get_cell_content()
                             row_list.append(str(val) if val is not None else "")
                 serialized.append(row_list)
-            # Uso del método proporcionado
             SpreadsheetSave.save_to_s2v(serialized, file_path)
         except Exception as e:
             raise SavingSpreadsheetException(str(e))
