@@ -343,7 +343,4 @@ class SpreadsheetController(Spreadsheet):
 
         self.create_spreadsheet()
 
-        # Rellenar contenidos usando self como controlador
         SpreadsheetLoad.load_spreadsheet(self, matrix)
-        
-        # badSpreadsheetLoad.load_spreadsheet(self, s_name_in_user_dir)
