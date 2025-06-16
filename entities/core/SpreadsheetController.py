@@ -51,7 +51,6 @@ class SpreadsheetController(Spreadsheet):
         if ctype == "FORMULA":
             formula = str_content[1:]
             content_obj = self.factory.create_formula(formula, self.spreadsheet)
-            #dependency , tokenizer,
         elif ctype == "NUM":
             try:
                 num = float(str_content)
@@ -67,11 +66,8 @@ class SpreadsheetController(Spreadsheet):
             cell = self.factory.create_cell(coord_obj, result)
             cell.formula = str_content
             self.set_dependencies(cell)
-            try:
-                pass
-                #self.circular_dependency_test(coord_obj, cell.dependencies)
-            except Exception:
-                raise CircularDependencyException(f"Circular dependency detected at {str(coord_obj)}")
+            #self.circular_dependency_test(cell.coordinate,cell.dependencies)
+
         else: # Si no es formula, guardem el contingut a la cell directament
             cell = self.factory.create_cell(coord_obj, content_obj.get_content())
 
@@ -79,26 +75,6 @@ class SpreadsheetController(Spreadsheet):
         
         self.update_dependent_cells(cell)
 
-
-    def circular_dependency_test(self, start: Coordinate, dependencies: list[Coordinate]) -> None:
-
-        visited = set()
-        stack = list(dependencies)  # arrancamos con sus dependencias directas
-
-        while stack:
-            current = stack.pop()
-            if current == start:
-                raise CircularDependencyException(f"Circular dependency detected at {start}")
-            if current in visited:
-                continue
-            visited.add(current)
-            cell = self.spreadsheet.cells.get(current)
-            if not cell:
-                continue
-            for dep in getattr(cell, 'dependencies', []):
-                stack.append(dep)
-
-            
     def set_dependencies(self, cell: Cell):
         cell.dependencies.clear() # borrar para crear la nova list
         tokens = Tokenizer.tokenize(cell.formula[1:])
@@ -172,6 +148,7 @@ class SpreadsheetController(Spreadsheet):
             
             self.set_cell_content(str_coord,str_content)
 
+
     def update_dependent_cells(self, changed_cell: Cell) -> None:
         start_coord = changed_cell.coordinate
 
@@ -197,39 +174,25 @@ class SpreadsheetController(Spreadsheet):
 
     ##
     # @brief Scans the spreadsheet to detect any circular dependencies among cells.
-    # @param Spreadsheet: The spreadsheet instance.
+    # @param Coordinate The coord changed
+    # @param dependencies the dependencies list
     # @exception CircularDependencyError Raised if circular dependencies are found.
     # @return None
-    def identify_circular_dependencies(self, cell: Cell):
-        """
-        Raise CircularDependencyException if setting 'cell' with given 'dependencies'
-        would introduce a cycle in the dependency graph.
-        """
-        def has_path(src: Coordinate, dst: Coordinate, visited: set) -> bool:
-            if src == dst:
-                return True
-            visited.add(src)
-            existing = self.spreadsheet.cells.get(src)
-            if not existing:
-                return False
-            for dep in existing.dependencies:
-                if dep not in visited:
-                    if has_path(dep, dst, visited):
-                        return True
-            return False
-
-
-        for dep in cell.dependencies:
-            # direct self-reference
-            if dep == cell.coordinate:
-                raise CircularDependencyException(
-                    f"Circular dependency detected: {cell.coordinate} refers to itself"
-                )
-            # if dep can reach cell, a cycle would form
-            if has_path(dep, cell.coordinate, set()):
-                raise CircularDependencyException(
-                    f"Circular dependency detected between {cell.coordinate} and {dep}"
-                )
+    def circular_dependency_test(self, start: Coordinate, dependencies: list[Coordinate]) -> None:
+        visited = set()
+        stack = list(dependencies)
+        while stack:
+            current = stack.pop()
+            if current == start:
+                raise CircularDependencyException(f"Circular dependency detected at {start}")
+            if current in visited:
+                continue
+            visited.add(current)
+            cell = self.spreadsheet.cells.get(current)
+            if not cell:
+                continue
+            for dep in getattr(cell, 'dependencies', []):
+                stack.append(dep)
 
     ##@brief Returns the value of the content of a cell as a float. See complete specification below following the link.
     #
