@@ -1,5 +1,6 @@
 # entities/core/SpreadsheetController.py
 import os
+from collections import deque
 from typing import List
 from collections import defaultdict
 from entities.core.Spreadsheet import Spreadsheet
@@ -64,24 +65,48 @@ class SpreadsheetController(Spreadsheet):
         if ctype == "FORMULA":
             result = content_obj.get_content()  # float del result of evaluation
             cell = self.factory.create_cell(coord_obj, result)
-            str_content.replace(',', ';')
             cell.formula = str_content
-            #self.set_dependencies(cell)
-            #self.update_dependent_cells(coord_obj)
+            self.set_dependencies(cell)
+            try:
+                pass
+                #self.circular_dependency_test(coord_obj, cell.dependencies)
+            except Exception:
+                raise CircularDependencyException(f"Circular dependency detected at {str(coord_obj)}")
         else: # Si no es formula, guardem el contingut a la cell directament
             cell = self.factory.create_cell(coord_obj, content_obj.get_content())
 
         self.spreadsheet.set_cell(coord_obj, cell) #Set content value
+        
+        self.update_dependent_cells(cell)
 
-        # propagate dependencies, no implementat encara
-        # self.spreadsheet.recalculate_from(coord_obj)
 
+    def circular_dependency_test(self, start: Coordinate, dependencies: list[Coordinate]) -> None:
+
+        visited = set()
+        stack = list(dependencies)  # arrancamos con sus dependencias directas
+
+        while stack:
+            current = stack.pop()
+            if current == start:
+                raise CircularDependencyException(f"Circular dependency detected at {start}")
+            if current in visited:
+                continue
+            visited.add(current)
+            cell = self.spreadsheet.cells.get(current)
+            if not cell:
+                continue
+            for dep in getattr(cell, 'dependencies', []):
+                stack.append(dep)
+
+            
     def set_dependencies(self, cell: Cell):
+        cell.dependencies.clear() # borrar para crear la nova list
         tokens = Tokenizer.tokenize(cell.formula[1:])
         dependencies: List[Coordinate] = []
         for token in tokens:
             # single-cell tokens
             try:
+                #if Coordinate.from_string(token) not in dependencies:
                 dependencies.append(Coordinate.from_string(token))
             except Exception:
                 pass
@@ -120,17 +145,55 @@ class SpreadsheetController(Spreadsheet):
 
     ##
     # @brief Updates all cells that depend on a modified cell.
-    # @param coord: The coordinate of the cell whose value was updated.
-    # @exception CircularDependencyError Raised if a circular dependency is found.
-    # @exception InvalidCellReferenceError Raised if a dependency is invalid.
+    # @param cell: Cell containing the dependancies to be updated
     # @return None.
-    def update_dependent_cells(self, coord: Coordinate):
-        for key in self.spreadsheet.cells:
-            cell = self.spreadsheet.cells[key]
-            if coord in cell.dependencies:
-                formula = cell.formula [1:]
-                content_obj = self.factory.create_formula(formula, self.spreadsheet)
-                self.spreadsheet.cells[key].content = content_obj.get_content()
+    def update_dependent_cells_err(self, cell:Cell):
+        cell_dep = cell.dependencies
+        while cell_dep:
+            coord = cell_dep[0]
+            cell_dep.remove(coord)
+            str_coord = str(coord)
+            cell_up = self.spreadsheet.cells[coord]
+            formula = cell_up.formula
+
+            if formula != None:
+                for new_cord in cell_up.dependencies:
+                    cell_dep.append(new_cord)
+                if not formula.startswith('='):
+                    formula = '=' + formula
+                self.set_cell_content(str_coord,formula)
+
+        for coord in cell_dep:
+            str_coord = str(coord)
+            str_content = self.spreadsheet.cells[coord].formula
+            if str_content:
+                if not str_content.startswith('='):
+                    str_content = '=' + str_content
+            
+            self.set_cell_content(str_coord,str_content)
+
+    def update_dependent_cells(self, changed_cell: Cell) -> None:
+        start_coord = changed_cell.coordinate
+
+        # queue and visitor
+        queue = deque([start_coord])
+        visited = {start_coord}
+
+        while queue:
+            curr = queue.popleft()
+            for coord, cell in list(self.spreadsheet.cells.items()):
+                if curr in cell.dependencies and coord not in visited:
+                    # 5) Reconstruir el contenido con '=' garantizado
+                    formula = getattr(cell, 'formula', None)
+                    if not formula: # no es una formula
+                        continue
+                    if not formula.startswith('='):
+                        formula = '=' + formula
+
+                    self.set_cell_content(str(coord), formula)
+                    visited.add(coord)
+                    queue.append(coord)
+
 
     ##
     # @brief Scans the spreadsheet to detect any circular dependencies among cells.
